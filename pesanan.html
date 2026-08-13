@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesanan - LaundryKu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #f0f2f5; min-height: 100vh; }
+
+        /* ── Sidebar ── */
+        .sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh;
+            background: linear-gradient(180deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            z-index: 1000; transition: transform 0.3s ease; overflow-y: auto; }
+        .sidebar-brand { padding: 24px 20px; display: flex; align-items: center; gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-brand .brand-icon { width: 42px; height: 42px;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .sidebar-brand .brand-icon i { font-size: 20px; color: white; }
+        .sidebar-brand h5 { color: white; font-size: 16px; font-weight: 700; margin: 0; }
+        .sidebar-brand small { color: rgba(255,255,255,0.5); font-size: 11px; }
+        .sidebar-menu { padding: 16px 12px; }
+        .sidebar-menu .menu-label { color: rgba(255,255,255,0.35); font-size: 11px;
+            text-transform: uppercase; letter-spacing: 1.2px; padding: 12px 12px 8px; font-weight: 600; }
+        .sidebar-menu .nav-link { display: flex; align-items: center; gap: 12px;
+            padding: 11px 14px; border-radius: 12px; color: rgba(255,255,255,0.6);
+            text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s ease; margin-bottom: 2px; }
+        .sidebar-menu .nav-link:hover { background: rgba(255,255,255,0.08); color: white; }
+        .sidebar-menu .nav-link.active { background: linear-gradient(135deg, rgba(0,210,255,0.2), rgba(58,123,213,0.2)); color: #00d2ff; }
+        .sidebar-menu .nav-link i { font-size: 18px; width: 22px; text-align: center; }
+        .sidebar-menu .nav-link .badge { margin-left: auto; font-size: 10px; padding: 3px 8px; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-footer .user-info { display: flex; align-items: center; gap: 10px; }
+        .sidebar-footer .user-avatar { width: 38px; height: 38px; border-radius: 10px;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5); display: flex;
+            align-items: center; justify-content: center; color: white; font-weight: 700;
+            font-size: 14px; flex-shrink: 0; }
+        .sidebar-footer .user-name { color: white; font-size: 13px; font-weight: 600; }
+        .sidebar-footer .user-role { color: rgba(255,255,255,0.5); font-size: 11px; }
+
+        /* ── Main ── */
+        .main-content { margin-left: 260px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        .topbar { background: white; padding: 14px 28px; display: flex; align-items: center;
+            justify-content: space-between; border-bottom: 1px solid #e9ecef; position: sticky; top: 0; z-index: 100; }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .btn-toggle-sidebar { display: none; background: none; border: none; font-size: 22px;
+            color: #495057; cursor: pointer; padding: 4px; }
+        .page-title h4 { font-size: 18px; font-weight: 700; color: #1a1a2e; margin: 0; }
+        .page-title small { color: #868e96; font-size: 12px; }
+        .topbar-right { display: flex; align-items: center; gap: 12px; }
+        .topbar-right .btn-icon { width: 40px; height: 40px; border-radius: 10px; border: 1px solid #e9ecef;
+            background: white; display: flex; align-items: center; justify-content: center;
+            color: #495057; font-size: 18px; cursor: pointer; transition: all 0.2s; position: relative; }
+        .topbar-right .btn-icon:hover { background: #f8f9fa; }
+        .content-wrapper { padding: 28px; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%;
+            height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+
+        /* ── Cards ── */
+        .card-custom { background: white; border-radius: 16px; border: 1px solid #e9ecef; overflow: hidden; }
+        .card-custom .card-header-custom { padding: 18px 22px; border-bottom: 1px solid #f1f3f5;
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+        .card-custom .card-header-custom h6 { font-size: 15px; font-weight: 700; color: #1a1a2e; margin: 0; }
+        .card-custom .card-body-custom { padding: 22px; }
+
+        /* ── Filter tabs ── */
+        .filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+        .filter-tab { padding: 7px 16px; border-radius: 10px; border: 1px solid #e9ecef;
+            background: white; font-size: 12px; font-weight: 600; color: #868e96;
+            cursor: pointer; transition: all 0.2s; }
+        .filter-tab:hover { background: #f8f9fa; color: #495057; }
+        .filter-tab.active { background: linear-gradient(135deg, #00d2ff, #3a7bd5); color: white; border-color: transparent; }
+        .filter-tab .count { background: rgba(255,255,255,0.25); padding: 1px 6px; border-radius: 6px;
+            font-size: 10px; margin-left: 4px; }
+        .filter-tab.active .count { background: rgba(255,255,255,0.3); }
+
+        /* ── Status badges ── */
+        .badge-status { padding: 5px 10px; border-radius: 8px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+        .badge-status.antrian  { background: rgba(255,165,0,0.1);  color: #e67e00; }
+        .badge-status.proses   { background: rgba(0,210,255,0.1);  color: #00b4d8; }
+        .badge-status.selesai  { background: rgba(40,167,69,0.1);  color: #28a745; }
+        .badge-status.diambil  { background: rgba(128,0,255,0.1);  color: #8000ff; }
+        .badge-status.batal    { background: rgba(220,53,69,0.1);  color: #dc3545; }
+
+        /* ── Table ── */
+        .table-custom { margin-bottom: 0; }
+        .table-custom thead th { background: #f8f9fa; border-bottom: 2px solid #e9ecef;
+            font-size: 12px; font-weight: 700; color: #868e96; text-transform: uppercase;
+            letter-spacing: 0.5px; padding: 12px 16px; white-space: nowrap; }
+        .table-custom tbody td { padding: 14px 16px; font-size: 13px; color: #495057;
+            vertical-align: middle; border-bottom: 1px solid #f1f3f5; }
+        .table-custom tbody tr { transition: background 0.15s; cursor: pointer; }
+        .table-custom tbody tr:hover { background: #f8f9fa; }
+
+        .order-id { font-weight: 700; color: #00d2ff; }
+        .customer-cell { font-weight: 600; color: #1a1a2e; }
+
+        .btn-action { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #e9ecef;
+            background: white; display: inline-flex; align-items: center; justify-content: center;
+            font-size: 13px; cursor: pointer; transition: all 0.2s; }
+        .btn-action:hover { background: #f8f9fa; }
+        .btn-action.view    { color: #00d2ff; border-color: rgba(0,210,255,0.3); }
+        .btn-action.view:hover    { background: rgba(0,210,255,0.08); }
+        .btn-action.delete { color: #dc3545; border-color: rgba(220,53,69,0.3); }
+        .btn-action.delete:hover { background: rgba(220,53,69,0.08); }
+
+        /* ── Detail Sidebar / Offcanvas ── */
+        .detail-panel { position: fixed; top: 0; right: -460px; width: 440px; height: 100vh;
+            background: white; box-shadow: -5px 0 30px rgba(0,0,0,0.12); z-index: 1100;
+            transition: right 0.3s ease; overflow-y: auto; }
+        .detail-panel.show { right: 0; }
+        .detail-panel-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%;
+            height: 100%; background: rgba(0,0,0,0.4); z-index: 1099; }
+        .detail-panel-overlay.show { display: block; }
+
+        .detail-header { padding: 20px 24px; border-bottom: 1px solid #f1f3f5;
+            display: flex; align-items: center; justify-content: space-between; position: sticky;
+            top: 0; background: white; z-index: 10; }
+        .detail-header h5 { font-size: 16px; font-weight: 700; color: #1a1a2e; margin: 0; }
+        .detail-close { background: none; border: none; font-size: 22px; color: #868e96;
+            cursor: pointer; padding: 4px; }
+        .detail-close:hover { color: #495057; }
+
+        .detail-body { padding: 24px; }
+
+        .detail-section { margin-bottom: 24px; }
+        .detail-section-title { font-size: 12px; font-weight: 700; color: #868e96;
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;
+            padding-bottom: 8px; border-bottom: 1px solid #f1f3f5; }
+
+        .detail-row { display: flex; justify-content: space-between; padding: 8px 0;
+            font-size: 13px; border-bottom: 1px solid #f8f9fa; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-row .label { color: #868e96; }
+        .detail-row .value { font-weight: 600; color: #1a1a2e; }
+
+        .detail-item { display: flex; align-items: center; gap: 12px; padding: 10px 0;
+            border-bottom: 1px solid #f1f3f5; }
+        .detail-item:last-child { border-bottom: none; }
+        .detail-item-icon { width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+            background: rgba(0,210,255,0.1); color: #00d2ff; }
+        .detail-item-info { flex: 1; }
+        .detail-item-name { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+        .detail-item-detail { font-size: 11px; color: #868e96; }
+        .detail-item-price { font-size: 13px; font-weight: 700; color: #1a1a2e; }
+
+        .detail-total-row { display: flex; justify-content: space-between; padding: 10px 0;
+            font-size: 14px; }
+        .detail-total-row.total { border-top: 2px solid #e9ecef; margin-top: 8px; padding-top: 12px;
+            font-size: 18px; font-weight: 700; color: #1a1a2e; }
+        .detail-total-row .discount { color: #28a745; }
+
+        /* ── Timeline ── */
+        .timeline { position: relative; padding-left: 24px; }
+        .timeline::before { content: ''; position: absolute; left: 8px; top: 0;
+            width: 2px; height: 100%; background: #e9ecef; }
+        .timeline-item { position: relative; padding-bottom: 16px; }
+        .timeline-item:last-child { padding-bottom: 0; }
+        .timeline-dot { position: absolute; left: -20px; top: 2px; width: 14px; height: 14px;
+            border-radius: 50%; border: 3px solid; background: white; }
+        .timeline-dot.blue   { border-color: #00d2ff; }
+        .timeline-dot.green  { border-color: #28a745; }
+        .timeline-dot.orange { border-color: #ffa500; }
+        .timeline-dot.purple { border-color: #8000ff; }
+        .timeline-text { font-size: 13px; color: #495057; font-weight: 500; }
+        .timeline-time { font-size: 11px; color: #adb5bd; margin-top: 2px; }
+
+        /* ── Action buttons in detail ── */
+        .detail-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .detail-actions .btn { flex: 1; min-width: 120px; border-radius: 10px; font-size: 13px;
+            font-weight: 600; padding: 10px 14px; }
+
+        /* ── Search ── */
+        .search-box { position: relative; }
+        .search-box input { border: 1px solid #e9ecef; border-radius: 10px; padding: 9px 14px 9px 36px;
+            font-size: 13px; color: #1a1a2e; width: 220px; transition: all 0.2s; }
+        .search-box input:focus { border-color: #00d2ff; box-shadow: 0 0 0 3px rgba(0,210,255,0.1); outline: none; }
+        .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            color: #adb5bd; font-size: 14px; }
+
+        /* ── Toast ── */
+        .toast-custom { position: fixed; bottom: 24px; right: 24px; background: #1a1a2e;
+            color: white; padding: 14px 20px; border-radius: 12px; font-size: 14px;
+            display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999; transform: translateY(100px); opacity: 0; transition: all 0.3s ease; }
+        .toast-custom.show { transform: translateY(0); opacity: 1; }
+        .toast-custom i { font-size: 20px; }
+        .toast-custom.success i { color: #28a745; }
+        .toast-custom.error   i { color: #dc3545; }
+
+        /* ── Bluetooth Printer ── */
+        .printer-status {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px; border-radius: 20px; font-size: 12px;
+            font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .printer-status.disconnected { background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); }
+        .printer-status.connected { background: rgba(40,167,69,0.1); color: #28a745; border: 1px solid rgba(40,167,69,0.2); }
+        .printer-status .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .printer-status.disconnected .status-dot { background: #dc3545; }
+        .printer-status.connected .status-dot { background: #28a745; }
+        .printer-status:hover { opacity: 0.8; }
+
+        .printer-modal-body { padding: 24px; }
+        .printer-device-card {
+            border: 2px solid #e9ecef; border-radius: 12px; padding: 16px;
+            display: flex; align-items: center; gap: 14px; margin-bottom: 12px;
+            transition: all 0.2s; cursor: pointer;
+        }
+        .printer-device-card:hover { border-color: #00d2ff; background: rgba(0,210,255,0.03); }
+        .printer-device-card .device-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: linear-gradient(135deg, rgba(0,210,255,0.1), rgba(58,123,213,0.1));
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .printer-device-card .device-icon i { font-size: 22px; color: #3a7bd5; }
+        .printer-device-card .device-name { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+        .printer-device-card .device-id { font-size: 11px; color: #868e96; font-family: monospace; }
+
+        .printer-test-btn {
+            margin-top: 12px; height: 44px; border: 2px solid #00d2ff;
+            border-radius: 10px; background: rgba(0,210,255,0.05); color: #00d2ff;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; width: 100%;
+        }
+        .printer-test-btn:hover { background: rgba(0,210,255,0.15); }
+
+        .printer-disconnect-btn {
+            margin-top: 8px; height: 44px; border: 2px solid #dc3545;
+            border-radius: 10px; background: rgba(220,53,69,0.05); color: #dc3545;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; width: 100%;
+        }
+        .printer-disconnect-btn:hover { background: rgba(220,53,69,0.15); }
+
+        .printer-info-box {
+            background: #f8f9fa; border-radius: 10px; padding: 14px;
+            margin-top: 16px; border-left: 3px solid #00d2ff;
+        }
+        .printer-info-box p { font-size: 12px; color: #495057; margin: 0; line-height: 1.6; }
+
+        .printer-printing-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: flex; align-items: center;
+            justify-content: center; z-index: 10000;
+        }
+        .printer-printing-card {
+            background: white; border-radius: 16px; padding: 32px;
+            text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .printer-printing-card .spinner-border { width: 48px; height: 48px; color: #00d2ff; }
+        .printer-printing-card p { margin-top: 16px; font-size: 14px; font-weight: 600; color: #1a1a2e; }
+
+        /* ── Responsive ── */
+        @media (max-width: 991.98px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.show { transform: translateX(0); }
+            .sidebar-overlay.show { display: block; }
+            .main-content { margin-left: 0; }
+            .btn-toggle-sidebar { display: block; }
+            .detail-panel { width: 100%; right: -100%; }
+        }
+        @media (max-width: 575.98px) {
+            .content-wrapper { padding: 16px; }
+            .topbar { padding: 12px 16px; }
+            .page-title h4 { font-size: 15px; }
+            .card-custom .card-body-custom { padding: 16px; }
+            .filter-tabs { gap: 4px; }
+            .filter-tab { padding: 6px 10px; font-size: 11px; }
+            .search-box input { width: 160px; }
+            .table-custom tbody td { padding: 10px 12px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon"><i class="bi bi-droplet-fill"></i></div>
+            <div><h5>LaundryKu</h5><small>Management System</small></div>
+        </div>
+        <nav class="sidebar-menu">
+            <div class="menu-label">Menu Utama</div>
+            <a href="dashboard.html" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+            <a href="kasir.html" class="nav-link"><i class="bi bi-cash-register"></i> Kasir</a>
+            <a href="pesanan.html" class="nav-link active"><i class="bi bi-receipt"></i> Pesanan <span class="badge bg-warning text-dark" id="sidebarBadge">12</span></a>
+            <a href="layanan.html" class="nav-link"><i class="bi bi-box-seam"></i> Layanan</a>
+            <div class="menu-label">Pelanggan</div>
+            <a href="#" class="nav-link"><i class="bi bi-people"></i> Daftar Pelanggan</a>
+            <a href="#" class="nav-link"><i class="bi bi-person-plus"></i> Tambah Pelanggan</a>
+            <div class="menu-label">Laporan</div>
+            <a href="laporan.html" class="nav-link"><i class="bi bi-graph-up"></i> Laporan Penjualan</a>
+            <a href="#" class="nav-link"><i class="bi bi-calendar-month"></i> Laporan Bulanan</a>
+            <div class="menu-label">Pengaturan</div>
+            <a href="#" class="nav-link"><i class="bi bi-gear"></i> Settings</a>
+            <a href="#" class="nav-link" id="btnLogout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div>
+                    <div class="user-name" id="userName">Administrator</div>
+                    <div class="user-role">Admin</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="btn-toggle-sidebar" id="toggleSidebar"><i class="bi bi-list"></i></button>
+                <div class="page-title">
+                    <h4>Pesanan</h4>
+                    <small>Kelola semua pesanan laundry</small>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="printer-status disconnected" id="printerStatus" title="Klik untuk sambungkan printer Bluetooth" onclick="openPrinterModal()">
+                    <span class="status-dot"></span>
+                    <i class="bi bi-printer"></i>
+                    <span id="printerStatusText">Printer Off</span>
+                </div>
+                <a href="kasir.html" class="btn btn-sm px-3" style="border-radius:10px; background:linear-gradient(135deg,#00d2ff,#3a7bd5); color:white; font-weight:600; font-size:13px; text-decoration:none;">
+                    <i class="bi bi-plus-lg me-1"></i>Pesanan Baru
+                </a>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+
+            <!-- Stats -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-lg-3">
+                    <div style="display:flex;align-items:center;gap:14px;padding:18px 20px;background:white;border-radius:14px;border:1px solid #e9ecef;">
+                        <div style="width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(0,210,255,0.1);color:#00d2ff;flex-shrink:0;"><i class="bi bi-receipt"></i></div>
+                        <div><div style="font-size:20px;font-weight:700;color:#1a1a2e;" id="statTotal">0</div><div style="font-size:12px;color:#868e96;">Total Pesanan</div></div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div style="display:flex;align-items:center;gap:14px;padding:18px 20px;background:white;border-radius:14px;border:1px solid #e9ecef;">
+                        <div style="width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(255,165,0,0.1);color:#ffa500;flex-shrink:0;"><i class="bi bi-hourglass-split"></i></div>
+                        <div><div style="font-size:20px;font-weight:700;color:#1a1a2e;" id="statAntrian">0</div><div style="font-size:12px;color:#868e96;">Antrian</div></div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div style="display:flex;align-items:center;gap:14px;padding:18px 20px;background:white;border-radius:14px;border:1px solid #e9ecef;">
+                        <div style="width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(0,210,255,0.1);color:#00b4d8;flex-shrink:0;"><i class="bi bi-gear"></i></div>
+                        <div><div style="font-size:20px;font-weight:700;color:#1a1a2e;" id="statProses">0</div><div style="font-size:12px;color:#868e96;">Dalam Proses</div></div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div style="display:flex;align-items:center;gap:14px;padding:18px 20px;background:white;border-radius:14px;border:1px solid #e9ecef;">
+                        <div style="width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(40,167,69,0.1);color:#28a745;flex-shrink:0;"><i class="bi bi-check-circle"></i></div>
+                        <div><div style="font-size:20px;font-weight:700;color:#1a1a2e;" id="statSelesai">0</div><div style="font-size:12px;color:#868e96;">Selesai</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="card-custom">
+                <div class="card-header-custom">
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <h6><i class="bi bi-list-ul me-2"></i>Semua Pesanan</h6>
+                        <div class="filter-tabs" id="filterTabs">
+                            <button class="filter-tab active" data-filter="all">Semua <span class="count" id="countAll">0</span></button>
+                            <button class="filter-tab" data-filter="antrian">Antrian <span class="count" id="countAntrian">0</span></button>
+                            <button class="filter-tab" data-filter="proses">Proses <span class="count" id="countProses">0</span></button>
+                            <button class="filter-tab" data-filter="selesai">Selesai <span class="count" id="countSelesai">0</span></button>
+                            <button class="filter-tab" data-filter="diambil">Diambil <span class="count" id="countDiambil">0</span></button>
+                            <button class="filter-tab" data-filter="batal">Batal <span class="count" id="countBatal">0</span></button>
+                        </div>
+                    </div>
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="searchOrder" placeholder="Cari pesanan...">
+                    </div>
+                </div>
+                <div class="card-body-custom p-0">
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>No. Pesanan</th>
+                                    <th>Pelanggan</th>
+                                    <th>Layanan</th>
+                                    <th>Berat</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Tanggal</th>
+                                    <th style="width:80px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Detail Panel -->
+    <div class="detail-panel-overlay" id="detailOverlay"></div>
+    <div class="detail-panel" id="detailPanel">
+        <div class="detail-header">
+            <h5 id="detailTitle">Detail Pesanan</h5>
+            <button class="detail-close" id="detailClose"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="detail-body" id="detailBody"></div>
+    </div>
+
+    <div class="toast-custom" id="toast"><i class="bi bi-check-circle-fill"></i><span id="toastText"></span></div>
+
+    <!-- Bluetooth Printer Modal -->
+    <div class="modal fade" id="printerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius:16px; border:none; overflow:hidden;">
+                <div class="modal-header" style="border-bottom:1px solid #f1f3f5; padding:18px 24px;">
+                    <h6 class="modal-title" style="font-weight:700; font-size:16px;">
+                        <i class="bi bi-bluetooth me-2" style="color:#3a7bd5;"></i>Printer Bluetooth
+                    </h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="printer-modal-body" id="printerModalBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Printing Overlay -->
+    <div class="printer-printing-overlay" id="printingOverlay" style="display:none;">
+        <div class="printer-printing-card">
+            <div class="spinner-border" role="status"></div>
+            <p>Sedang mencetak struk...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        if (sessionStorage.getItem('loggedIn') !== 'true') { window.location.href = 'index.html'; return; }
+        const userData = JSON.parse(sessionStorage.getItem('user'));
+        if (userData) {
+            document.getElementById('userName').textContent = userData.name;
+            document.getElementById('userAvatar').textContent = userData.name.charAt(0).toUpperCase();
+        }
+
+        // ── Sidebar ──
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            sidebar.classList.toggle('show'); overlay.classList.toggle('show');
+        });
+        overlay.addEventListener('click', function() { sidebar.classList.remove('show'); overlay.classList.remove('show'); });
+
+        document.getElementById('btnLogout').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Yakin ingin keluar?')) { sessionStorage.clear(); window.location.href = 'index.html'; }
+        });
+
+        // ── Data ──
+        const SERVICES_DATA = {
+            'Cuci Kering':  { icon: 'bi-droplet',  color: 'blue',   price: 10000 },
+            'Cuci Setrika': { icon: 'bi-fire',     color: 'orange', price: 12000 },
+            'Setrika Saja': { icon: 'bi-lightning', color: 'purple', price: 7000  },
+            'Dry Clean':    { icon: 'bi-wind',     color: 'teal',   price: 20000 },
+            'Cuci Sepatu':  { icon: 'bi-foot',     color: 'red',    price: 25000 },
+            'Cuci Selimut': { icon: 'bi-cloud',    color: 'green',  price: 15000 },
+        };
+
+        const STATUS_LABELS = { antrian: 'Antrian', proses: 'Dalam Proses', selesai: 'Selesai', diambil: 'Diambil', batal: 'Dibatalkan' };
+
+        let orders = JSON.parse(localStorage.getItem('laundryOrders')) || [
+            { id: 'LG-0128', customer: 'Budi Santoso',   phone: '081234567890', address: 'Jl. Merdeka No. 10',
+              items: [{ service: 'Cuci Setrika', weight: 3, price: 12000 }, { service: 'Setrika Saja', weight: 2, price: 7000 }],
+              subtotal: 50000, discount: 0, total: 50000, payment: 'cash', status: 'antrian', date: '2026-07-31T08:32:00', note: '' },
+            { id: 'LG-0127', customer: 'Sari Dewi',       phone: '081298765432', address: 'Jl. Sudirman No. 25',
+              items: [{ service: 'Cuci Kering', weight: 2.5, price: 10000 }],
+              subtotal: 25000, discount: 0, total: 25000, payment: 'ewallet', status: 'proses', date: '2026-07-31T08:15:00', note: 'Ada noda minyak di baju' },
+            { id: 'LG-0126', customer: 'Andi Wijaya',     phone: '085678901234', address: 'Jl. Gatot Subroto No. 5',
+              items: [{ service: 'Setrika Saja', weight: 2, price: 7000 }],
+              subtotal: 14000, discount: 0, total: 14000, payment: 'transfer', status: 'proses', date: '2026-07-31T07:58:00', note: '' },
+            { id: 'LG-0125', customer: 'Rina Marlina',    phone: '087890123456', address: 'Jl. Asia Afrika No. 12',
+              items: [{ service: 'Cuci Setrika', weight: 4, price: 12000 }],
+              subtotal: 48000, discount: 5000, total: 43000, payment: 'cash', status: 'selesai', date: '2026-07-31T07:42:00', note: '' },
+            { id: 'LG-0124', customer: 'Dedi Kurniawan',  phone: '083456789012', address: 'Jl. Pahlawan No. 8',
+              items: [{ service: 'Cuci Kering', weight: 5, price: 10000 }],
+              subtotal: 50000, discount: 0, total: 50000, payment: 'cash', status: 'selesai', date: '2026-07-31T07:20:00', note: '' },
+            { id: 'LG-0123', customer: 'Maya Putri',      phone: '089012345678', address: 'Jl. Diponegoro No. 3',
+              items: [{ service: 'Cuci Setrika', weight: 1.5, price: 12000 }],
+              subtotal: 18000, discount: 0, total: 18000, payment: 'ewallet', status: 'diambil', date: '2026-07-31T07:05:00', note: '' },
+            { id: 'LG-0122', customer: 'Rizky Pratama',   phone: '082345678901', address: 'Jl. Imam Bonjol No. 15',
+              items: [{ service: 'Dry Clean', weight: 2, price: 20000 }],
+              subtotal: 40000, discount: 0, total: 40000, payment: 'transfer', status: 'batal', date: '2026-07-31T06:50:00', note: 'Pelanggan batalkan' },
+            { id: 'LG-0121', customer: 'Lestari Budiman', phone: '084567890123', address: 'Jl. Kartini No. 20',
+              items: [{ service: 'Cuci Setrika', weight: 3.5, price: 12000 }, { service: 'Cuci Selimut', weight: 2, price: 15000 }],
+              subtotal: 72000, discount: 0, total: 72000, payment: 'cash', status: 'diambil', date: '2026-07-31T06:30:00', note: '' },
+            { id: 'LG-0120', customer: 'Fajar Nugroho',   phone: '086789012345', address: 'Jl. Hayam Wuruk No. 7',
+              items: [{ service: 'Cuci Sepatu', weight: 1, price: 25000 }],
+              subtotal: 25000, discount: 0, total: 25000, payment: 'ewallet', status: 'proses', date: '2026-07-30T16:20:00', note: 'Sepatu Nike putih' },
+            { id: 'LG-0119', customer: 'Diana Sari',      phone: '080123456789', address: 'Jl. Mangkubumi No. 11',
+              items: [{ service: 'Cuci Kering', weight: 3, price: 10000 }, { service: 'Setrika Saja', weight: 3, price: 7000 }],
+              subtotal: 51000, discount: 5000, total: 46000, payment: 'cash', status: 'selesai', date: '2026-07-30T14:10:00', note: '' },
+            { id: 'LG-0118', customer: 'Hendra Wijaya',   phone: '081122334455', address: 'Jl. Veteran No. 9',
+              items: [{ service: 'Cuci Setrika', weight: 6, price: 12000 }],
+              subtotal: 72000, discount: 0, total: 72000, payment: 'transfer', status: 'diambil', date: '2026-07-30T11:05:00', note: '' },
+            { id: 'LG-0117', customer: 'Putri Anggraini', phone: '089988776655', address: 'Jl. Braga No. 4',
+              items: [{ service: 'Cuci Kering', weight: 2, price: 10000 }],
+              subtotal: 20000, discount: 0, total: 20000, payment: 'cash', status: 'selesai', date: '2026-07-30T09:30:00', note: '' },
+        ];
+
+        let currentFilter = 'all';
+
+        function saveOrders() { localStorage.setItem('laundryOrders', JSON.stringify(orders)); }
+
+        // ── Render ──
+        const orderTable = document.getElementById('orderTable');
+
+        function updateCounts() {
+            const counts = { all: orders.length, antrian: 0, proses: 0, selesai: 0, diambil: 0, batal: 0 };
+            orders.forEach(function(o) { if (counts[o.status] !== undefined) counts[o.status]++; });
+            document.getElementById('countAll').textContent = counts.all;
+            document.getElementById('countAntrian').textContent = counts.antrian;
+            document.getElementById('countProses').textContent = counts.proses;
+            document.getElementById('countSelesai').textContent = counts.selesai;
+            document.getElementById('countDiambil').textContent = counts.diambil;
+            document.getElementById('countBatal').textContent = counts.batal;
+            document.getElementById('sidebarBadge').textContent = counts.antrian + counts.proses;
+
+            document.getElementById('statTotal').textContent = counts.all;
+            document.getElementById('statAntrian').textContent = counts.antrian;
+            document.getElementById('statProses').textContent = counts.proses;
+            document.getElementById('statSelesai').textContent = counts.selesai;
+        }
+
+        function render() {
+            const search = document.getElementById('searchOrder').value.trim().toLowerCase();
+            let list = orders;
+
+            if (currentFilter !== 'all') {
+                list = list.filter(function(o) { return o.status === currentFilter; });
+            }
+            if (search) {
+                list = list.filter(function(o) {
+                    return o.id.toLowerCase().includes(search) ||
+                           o.customer.toLowerCase().includes(search) ||
+                           o.items.some(function(i) { return i.service.toLowerCase().includes(search); });
+                });
+            }
+
+            orderTable.innerHTML = '';
+            if (list.length === 0) {
+                orderTable.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px; color:#adb5bd;"><i class="bi bi-inbox" style="font-size:36px; display:block; margin-bottom:8px;"></i>Tidak ada pesanan ditemukan</td></tr>';
+                updateCounts();
+                return;
+            }
+
+            list.forEach(function(order) {
+                const svcNames = order.items.map(function(i) { return i.service; }).join(', ');
+                const totalWeight = order.items.reduce(function(s, i) { return s + i.weight; }, 0);
+                const date = new Date(order.date);
+                const dateStr = date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+                const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+                const tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td><span class="order-id">' + order.id + '</span></td>' +
+                    '<td><div class="customer-cell">' + order.customer + '</div><div style="font-size:11px;color:#868e96;">' + order.phone + '</div></td>' +
+                    '<td>' + svcNames + '</td>' +
+                    '<td>' + totalWeight + ' kg</td>' +
+                    '<td><strong>Rp ' + order.total.toLocaleString('id-ID') + '</strong></td>' +
+                    '<td><span class="badge-status ' + order.status + '">' + STATUS_LABELS[order.status] + '</span></td>' +
+                    '<td><div style="font-size:12px;">' + dateStr + '</div><div style="font-size:11px;color:#adb5bd;">' + timeStr + '</div></td>' +
+                    '<td><div class="d-flex gap-1">' +
+                        '<button class="btn-action view" data-id="' + order.id + '" title="Lihat Detail"><i class="bi bi-eye"></i></button>' +
+                        '<button class="btn-action delete" data-id="' + order.id + '" title="Hapus"><i class="bi bi-trash3"></i></button>' +
+                    '</div></td>';
+                orderTable.appendChild(tr);
+            });
+
+            orderTable.querySelectorAll('.btn-action.view').forEach(function(btn) {
+                btn.addEventListener('click', function(e) { e.stopPropagation(); openDetail(this.dataset.id); });
+            });
+            orderTable.querySelectorAll('.btn-action.delete').forEach(function(btn) {
+                btn.addEventListener('click', function(e) { e.stopPropagation(); deleteOrder(this.dataset.id); });
+            });
+            orderTable.querySelectorAll('tr').forEach(function(tr) {
+                tr.addEventListener('click', function() {
+                    var id = this.querySelector('.order-id');
+                    if (id) openDetail(id.textContent);
+                });
+            });
+
+            updateCounts();
+        }
+
+        // ── Filter tabs ──
+        document.querySelectorAll('.filter-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
+                tab.classList.add('active');
+                currentFilter = tab.dataset.filter;
+                render();
+            });
+        });
+
+        // ── Search ──
+        document.getElementById('searchOrder').addEventListener('input', render);
+
+        // ── Detail Panel ──
+        const detailPanel  = document.getElementById('detailPanel');
+        const detailOverlay = document.getElementById('detailOverlay');
+        const detailBody   = document.getElementById('detailBody');
+
+        document.getElementById('detailClose').addEventListener('click', closeDetail);
+        detailOverlay.addEventListener('click', closeDetail);
+
+        function closeDetail() {
+            detailPanel.classList.remove('show');
+            detailOverlay.classList.remove('show');
+        }
+
+        function openDetail(id) {
+            const order = orders.find(function(o) { return o.id === id; });
+            if (!order) return;
+
+            document.getElementById('detailTitle').textContent = 'Pesanan ' + order.id;
+
+            const date = new Date(order.date);
+            const dateStr = date.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+            let itemsHtml = '';
+            order.items.forEach(function(item) {
+                const svc = SERVICES_DATA[item.service] || { icon: 'bi-box', color: 'blue' };
+                const sub = Math.round(item.weight * item.price);
+                itemsHtml +=
+                    '<div class="detail-item">' +
+                        '<div class="detail-item-icon"><i class="bi ' + svc.icon + '"></i></div>' +
+                        '<div class="detail-item-info">' +
+                            '<div class="detail-item-name">' + item.service + '</div>' +
+                            '<div class="detail-item-detail">' + item.weight + ' kg &times; Rp ' + item.price.toLocaleString('id-ID') + '</div>' +
+                        '</div>' +
+                        '<div class="detail-item-price">Rp ' + sub.toLocaleString('id-ID') + '</div>' +
+                    '</div>';
+            });
+
+            let timelineHtml = '';
+            const timelineData = getTimeline(order);
+            timelineData.forEach(function(t) {
+                timelineHtml +=
+                    '<div class="timeline-item">' +
+                        '<div class="timeline-dot ' + t.color + '"></div>' +
+                        '<div class="timeline-text">' + t.text + '</div>' +
+                        '<div class="timeline-time">' + t.time + '</div>' +
+                    '</div>';
+            });
+
+            const actions = getActions(order);
+
+            detailBody.innerHTML =
+                '<div class="detail-section">' +
+                    '<div class="detail-section-title">Informasi Pelanggan</div>' +
+                    '<div class="detail-row"><span class="label">Nama</span><span class="value">' + order.customer + '</span></div>' +
+                    '<div class="detail-row"><span class="label">Telepon</span><span class="value">' + order.phone + '</span></div>' +
+                    '<div class="detail-row"><span class="label">Alamat</span><span class="value">' + (order.address || '-') + '</span></div>' +
+                    (order.note ? '<div class="detail-row"><span class="label">Catatan</span><span class="value" style="color:#e67e00;">' + order.note + '</span></div>' : '') +
+                '</div>' +
+                '<div class="detail-section">' +
+                    '<div class="detail-section-title">Item Pesanan</div>' +
+                    itemsHtml +
+                '</div>' +
+                '<div class="detail-section">' +
+                    '<div class="detail-section-title">Ringkasan Pembayaran</div>' +
+                    '<div class="detail-total-row"><span>Subtotal</span><span>Rp ' + order.subtotal.toLocaleString('id-ID') + '</span></div>' +
+                    '<div class="detail-total-row"><span>Diskon</span><span class="discount">- Rp ' + order.discount.toLocaleString('id-ID') + '</span></div>' +
+                    '<div class="detail-total-row total"><span>Total</span><span>Rp ' + order.total.toLocaleString('id-ID') + '</span></div>' +
+                    '<div class="detail-row"><span class="label">Pembayaran</span><span class="value" style="text-transform:uppercase;">' + order.payment + '</span></div>' +
+                    '<div class="detail-row"><span class="label">Tanggal</span><span class="value">' + dateStr + ' ' + timeStr + '</span></div>' +
+                '</div>' +
+                '<div class="detail-section">' +
+                    '<div class="detail-section-title">Riwayat Status</div>' +
+                    '<div class="timeline">' + timelineHtml + '</div>' +
+                '</div>' +
+                '<div class="detail-section">' +
+                    '<div class="detail-section-title">Aksi</div>' +
+                    '<div class="detail-actions">' + actions + '</div>' +
+                '</div>';
+
+            detailPanel.classList.add('show');
+            detailOverlay.classList.add('show');
+        }
+
+        function getTimeline(order) {
+            const date = new Date(order.date);
+            const items = [
+                { text: 'Pesanan diterima', time: date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), color: 'blue' }
+            ];
+
+            if (order.status === 'proses' || order.status === 'selesai' || order.status === 'diambil') {
+                date.setMinutes(date.getMinutes() + 30);
+                items.push({ text: 'Sedang diproses', time: date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), color: 'orange' });
+            }
+            if (order.status === 'selesai' || order.status === 'diambil') {
+                date.setHours(date.getHours() + 2);
+                items.push({ text: 'Pesanan selesai', time: date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), color: 'green' });
+            }
+            if (order.status === 'diambil') {
+                date.setHours(date.getHours() + 1);
+                items.push({ text: 'Pesanan diambil pelanggan', time: date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), color: 'purple' });
+            }
+            if (order.status === 'batal') {
+                items.push({ text: 'Pesanan dibatalkan', time: '-', color: 'orange' });
+            }
+
+            return items;
+        }
+
+        function getActions(order) {
+            let html = '';
+            if (order.status === 'antrian') {
+                html += '<button class="btn btn-sm" style="background:linear-gradient(135deg,#00d2ff,#3a7bd5);color:white;border-radius:10px;" onclick="updateStatus(\'' + order.id + '\',\'proses\')"><i class="bi bi-play-circle me-1"></i>Mulai Proses</button>';
+                html += '<button class="btn btn-sm" style="border:1px solid #dc3545;color:#dc3545;border-radius:10px;" onclick="updateStatus(\'' + order.id + '\',\'batal\')"><i class="bi bi-x-circle me-1"></i>Batalkan</button>';
+            } else if (order.status === 'proses') {
+                html += '<button class="btn btn-sm" style="background:linear-gradient(135deg,#28a745,#20c997);color:white;border-radius:10px;" onclick="updateStatus(\'' + order.id + '\',\'selesai\')"><i class="bi bi-check-circle me-1"></i>Tandai Selesai</button>';
+            } else if (order.status === 'selesai') {
+                html += '<button class="btn btn-sm" style="background:linear-gradient(135deg,#8000ff,#a855f7);color:white;border-radius:10px;" onclick="updateStatus(\'' + order.id + '\',\'diambil\')"><i class="bi bi-bag-check me-1"></i>Tandai Diambil</button>';
+            }
+            html += '<button class="btn btn-sm" style="border:1px solid #e9ecef;color:#495057;border-radius:10px;" onclick="printReceipt(\'' + order.id + '\')"><i class="bi bi-printer me-1"></i>Cetak Struk</button>';
+            return html;
+        }
+
+        // ── Global functions ──
+        window.updateStatus = function(id, newStatus) {
+            var order = orders.find(function(o) { return o.id === id; });
+            if (!order) return;
+            order.status = newStatus;
+            saveOrders();
+            render();
+            openDetail(id);
+            showToast('Status pesanan ' + id + ' diperbarui!', 'success');
+        };
+
+        window.printReceipt = function(id) {
+            var order = orders.find(function(o) { return o.id === id; });
+            if (!order) return;
+            var date = new Date(order.date);
+
+            // Try Bluetooth printing first
+            if (btDevice && btDevice.gatt.connected && btCharacteristic) {
+                var overlay = document.getElementById('printingOverlay');
+                overlay.style.display = 'flex';
+
+                var receiptData = buildReceipt(order, date);
+                sendToPrinter(receiptData).then(function() {
+                    overlay.style.display = 'none';
+                    showToast('Struk berhasil dicetak!', 'success');
+                }).catch(function(err) {
+                    overlay.style.display = 'none';
+                    showToast('Gagal mencetak: ' + err.message, 'error');
+                    showReceiptAlert(order, date);
+                });
+            } else {
+                showReceiptAlert(order, date);
+            }
+        };
+
+        function showReceiptAlert(order, date) {
+            var detail = '';
+            order.items.forEach(function(i) {
+                detail += i.service + ' (' + i.weight + 'kg) = Rp ' + (i.weight * i.price).toLocaleString('id-ID') + '\n';
+            });
+            alert(
+                '=== STRUK LAUNDRYKU ===\n' +
+                'No. Pesanan : ' + order.id + '\n' +
+                'Pelanggan   : ' + order.customer + '\n' +
+                'Telepon     : ' + order.phone + '\n' +
+                'Tanggal     : ' + date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}) + '\n\n' +
+                '--- DETAIL ---\n' + detail +
+                '\nSubtotal  : Rp ' + order.subtotal.toLocaleString('id-ID') +
+                '\nDiskon    : - Rp ' + order.discount.toLocaleString('id-ID') +
+                '\nTOTAL     : Rp ' + order.total.toLocaleString('id-ID') +
+                '\nPembayaran: ' + order.payment.toUpperCase() +
+                '\nStatus    : ' + STATUS_LABELS[order.status] +
+                '\n\nTerima kasih!'
+            );
+        }
+
+        function deleteOrder(id) {
+            var order = orders.find(function(o) { return o.id === id; });
+            if (!order) return;
+            if (!confirm('Hapus pesanan ' + id + ' dari ' + order.customer + '?')) return;
+            orders = orders.filter(function(o) { return o.id !== id; });
+            saveOrders();
+            closeDetail();
+            render();
+            showToast('Pesanan ' + id + ' berhasil dihapus!', 'error');
+        }
+
+        // ── Toast ──
+        function showToast(msg, type) {
+            var t = document.getElementById('toast');
+            t.className = 'toast-custom ' + type;
+            t.querySelector('i').className = type === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill';
+            document.getElementById('toastText').textContent = msg;
+            t.classList.add('show');
+            setTimeout(function() { t.classList.remove('show'); }, 3000);
+        }
+
+        // ── Bluetooth Thermal Printer ──
+        var btDevice = null;
+        var btCharacteristic = null;
+        var printerModal = null;
+        var userData = JSON.parse(sessionStorage.getItem('user') || '{}');
+
+        function initPrinterModal() {
+            printerModal = new bootstrap.Modal(document.getElementById('printerModal'));
+            var saved = JSON.parse(localStorage.getItem('laundryku_printer') || 'null');
+            if (saved) {
+                document.getElementById('printerStatus').className = 'printer-status disconnected';
+                document.getElementById('printerStatusText').textContent = saved.name || 'Printer Off';
+            }
+        }
+
+        window.openPrinterModal = function() {
+            renderPrinterModalContent();
+            printerModal.show();
+        };
+
+        function renderPrinterModalContent() {
+            var body = document.getElementById('printerModalBody');
+            var saved = JSON.parse(localStorage.getItem('laundryku_printer') || 'null');
+            var isConnected = btDevice && btDevice.gatt.connected;
+
+            if (isConnected) {
+                body.innerHTML =
+                    '<div class="printer-device-card" style="border-color:#28a745;">' +
+                        '<div class="device-icon"><i class="bi bi-printer" style="color:#28a745;"></i></div>' +
+                        '<div><div class="device-name" style="color:#28a745;">' + (btDevice.name || 'Printer') + '</div>' +
+                        '<div class="device-id">Terhubung &bull; Siap mencetak</div></div>' +
+                    '</div>' +
+                    '<button class="printer-test-btn" onclick="testPrintFromPesanan()"><i class="bi bi-printer me-1"></i>Cetak Test</button>' +
+                    '<button class="printer-disconnect-btn" onclick="disconnectPrinter()"><i class="bi bi-x-circle me-1"></i>Putuskan Koneksi</button>';
+            } else {
+                body.innerHTML =
+                    '<div style="text-align:center; padding:10px 0;">' +
+                        '<i class="bi bi-bluetooth" style="font-size:48px; color:#adb5bd;"></i>' +
+                        '<p style="margin-top:12px; font-size:14px; color:#868e96;">Tekan tombol di bawah untuk mencari printer</p>' +
+                    '</div>' +
+                    '<button class="btn btn-primary-custom" id="btnScanPrinter" onclick="scanAndConnectPrinter()" style="width:100%; height:50px; border:none; border-radius:12px; background:linear-gradient(135deg,#00d2ff,#3a7bd5); color:white; font-size:15px; font-weight:600; cursor:pointer;">' +
+                        '<i class="bi bi-search me-2"></i>Cari Printer Bluetooth' +
+                    '</button>' +
+                    '<div class="printer-info-box">' +
+                        '<p><i class="bi bi-info-circle me-1"></i> Pastikan printer thermal sudah menyala dan dalam mode pairing. Gunakan printer dengan protocol ESC/POS.</p>' +
+                    '</div>';
+            }
+        }
+
+        window.scanAndConnectPrinter = function() {
+            if (!navigator.bluetooth) {
+                showToast('Browser tidak mendukung Web Bluetooth! Gunakan Chrome.', 'error');
+                return;
+            }
+            var btn = document.getElementById('btnScanPrinter');
+            if (btn) { btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mencari printer...'; btn.disabled = true; }
+
+            navigator.bluetooth.requestDevice({
+                filters: [
+                    { services: ['000018f0-0000-1000-8000-00805f9b34fb'] },
+                    { namePrefix: 'Printer' }, { namePrefix: 'printer' },
+                    { namePrefix: 'BT-' }, { namePrefix: 'MTP-' },
+                    { namePrefix: 'POS' }, { namePrefix: 'Blue' }, { namePrefix: 'TG' }
+                ],
+                optionalServices: [
+                    '000018f0-0000-1000-8000-00805f9b34fb',
+                    '0000ffe0-0000-1000-8000-00805f9b34fb',
+                    '00001101-0000-1000-8000-00805f9b34fb'
+                ]
+            }).then(function(device) {
+                btDevice = device;
+                device.addEventListener('gattserverdisconnected', function() {
+                    btDevice = null; btCharacteristic = null;
+                    document.getElementById('printerStatus').className = 'printer-status disconnected';
+                    document.getElementById('printerStatusText').textContent = 'Printer Off';
+                    showToast('Printer terputus!', 'error');
+                });
+                showToast('Menyambungkan ke ' + (device.name || 'printer') + '...', 'success');
+                return device.gatt.connect();
+            }).then(function(gattServer) {
+                return gattServer.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb')
+                    .catch(function() { return gattServer.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb'); })
+                    .catch(function() { return gattServer.getPrimaryService('00001101-0000-1000-8000-00805f9b34fb'); });
+            }).then(function(service) {
+                return service.getCharacteristics();
+            }).then(function(characteristics) {
+                btCharacteristic = null;
+                for (var i = 0; i < characteristics.length; i++) {
+                    if (characteristics[i].properties.write || characteristics[i].properties.writeWithoutResponse) {
+                        btCharacteristic = characteristics[i]; break;
+                    }
+                }
+                if (!btCharacteristic && characteristics.length > 0) btCharacteristic = characteristics[characteristics.length - 1];
+                if (!btCharacteristic) throw new Error('Tidak ditemukan characteristic untuk menulis');
+
+                localStorage.setItem('laundryku_printer', JSON.stringify({ name: btDevice.name || 'Printer', id: btDevice.id }));
+                document.getElementById('printerStatus').className = 'printer-status connected';
+                document.getElementById('printerStatusText').textContent = btDevice.name || 'Printer';
+                showToast('Printer ' + (btDevice.name || 'Printer') + ' terhubung!', 'success');
+                renderPrinterModalContent();
+            }).catch(function(err) {
+                console.error('Bluetooth error:', err);
+                showToast('Gagal menyambungkan: ' + err.message, 'error');
+                if (btn) { btn.innerHTML = '<i class="bi bi-search me-2"></i>Cari Printer Bluetooth'; btn.disabled = false; }
+            });
+        };
+
+        window.disconnectPrinter = function() {
+            if (btDevice && btDevice.gatt.connected) btDevice.gatt.disconnect();
+            btDevice = null; btCharacteristic = null;
+            localStorage.removeItem('laundryku_printer');
+            document.getElementById('printerStatus').className = 'printer-status disconnected';
+            document.getElementById('printerStatusText').textContent = 'Printer Off';
+            renderPrinterModalContent();
+            showToast('Printer diputuskan.', 'error');
+        };
+
+        function repeatChar(ch, n) { var s = ''; for (var i = 0; i < n; i++) s += ch; return s; }
+
+        function buildReceipt(order, date) {
+            var N = '\n';
+            var DASHES = '================================';
+            var lines = [];
+            lines.push('\x1B\x61\x01'); lines.push('\x1B\x45\x01');
+            lines.push('LAUNDRYKU' + N);
+            lines.push('\x1B\x45\x00');
+            lines.push('Jl. Contoh No. 123, Kota' + N);
+            lines.push('Telp: 0812-3456-7890' + N);
+            lines.push('\x1B\x61\x00');
+            lines.push(DASHES + N);
+            lines.push('No.  : ' + order.id + N);
+            lines.push('Tgl  : ' + date.toLocaleDateString('id-ID', {day:'2-digit',month:'2-digit',year:'numeric'}) + N);
+            lines.push('Jam  : ' + date.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}) + N);
+            lines.push('Kasir: ' + (userData.name || '-') + N);
+            lines.push(DASHES + N);
+            lines.push('\x1B\x45\x01'); lines.push('PELANGGAN' + N); lines.push('\x1B\x45\x00');
+            lines.push('Nama : ' + order.customer + N);
+            lines.push('Telp : ' + (order.phone || '-') + N);
+            lines.push(DASHES + N);
+            lines.push('\x1B\x45\x01'); lines.push('DETAIL LAYANAN' + N); lines.push('\x1B\x45\x00');
+            order.items.forEach(function(item) {
+                var nameLine = item.service + ' (' + item.weight + 'kg)';
+                var priceLine = 'Rp ' + (item.weight * item.price).toLocaleString('id-ID');
+                var padding = 32 - nameLine.length - priceLine.length;
+                if (padding < 1) padding = 1;
+                lines.push(nameLine + repeatChar(' ', padding) + priceLine + N);
+            });
+            lines.push(DASHES + N);
+            lines.push('Subtotal  : Rp ' + order.subtotal.toLocaleString('id-ID') + N);
+            if (order.discount > 0) lines.push('Diskon    : - Rp ' + order.discount.toLocaleString('id-ID') + N);
+            lines.push('\x1B\x45\x01'); lines.push('TOTAL     : Rp ' + order.total.toLocaleString('id-ID') + N); lines.push('\x1B\x45\x00');
+            lines.push(DASHES + N);
+            lines.push('Bayar  : ' + order.payment.toUpperCase() + N);
+            lines.push('Status : ' + STATUS_LABELS[order.status] + N);
+            lines.push(DASHES + N);
+            lines.push('\x1B\x61\x01');
+            lines.push('Terima kasih atas kunjungan Anda' + N);
+            lines.push('Barang tidak dapat diklaim' + N);
+            lines.push('lebih dari 7 hari' + N);
+            lines.push(N + N);
+            lines.push('\x1B\x64\x03');
+            lines.push('\x1D\x56\x00');
+            return new TextEncoder().encode(lines.join(''));
+        }
+
+        async function sendToPrinter(data) {
+            if (!btCharacteristic) throw new Error('Printer tidak terhubung');
+            for (var i = 0; i < data.length; i += 200) {
+                await btCharacteristic.writeValueWithoutResponse(data.slice(i, i + 200));
+                await new Promise(function(r) { setTimeout(r, 20); });
+            }
+        }
+
+        window.testPrintFromPesanan = async function() {
+            if (!btDevice || !btDevice.gatt.connected) { showToast('Printer tidak terhubung!', 'error'); return; }
+            var overlay = document.getElementById('printingOverlay');
+            overlay.style.display = 'flex';
+            try {
+                var testReceipt = '\x1B\x61\x01\x1B\x45\x01TEST PRINT\n\x1B\x45\x00LaundryKu POS\n================================\n\x1B\x61\x00Printer berhasil terhubung!\nTanggal: ' + new Date().toLocaleDateString('id-ID') + '\nWaktu  : ' + new Date().toLocaleTimeString('id-ID') + '\n================================\n\n\x1B\x61\x01Semua siap digunakan :)\n\n\n\x1B\x64\x03\x1D\x56\x00';
+                await sendToPrinter(new TextEncoder().encode(testReceipt));
+                overlay.style.display = 'none';
+                showToast('Test print berhasil!', 'success');
+            } catch (err) {
+                overlay.style.display = 'none';
+                showToast('Gagal test print: ' + err.message, 'error');
+            }
+        };
+
+        initPrinterModal();
+        render();
+    });
+    </script>
+</body>
+</html>

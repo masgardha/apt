@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layanan - LaundryKu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #f0f2f5; min-height: 100vh; }
+
+        /* ── Sidebar ── */
+        .sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh;
+            background: linear-gradient(180deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            z-index: 1000; transition: transform 0.3s ease; overflow-y: auto; }
+        .sidebar-brand { padding: 24px 20px; display: flex; align-items: center; gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-brand .brand-icon { width: 42px; height: 42px;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .sidebar-brand .brand-icon i { font-size: 20px; color: white; }
+        .sidebar-brand h5 { color: white; font-size: 16px; font-weight: 700; margin: 0; }
+        .sidebar-brand small { color: rgba(255,255,255,0.5); font-size: 11px; }
+        .sidebar-menu { padding: 16px 12px; }
+        .sidebar-menu .menu-label { color: rgba(255,255,255,0.35); font-size: 11px;
+            text-transform: uppercase; letter-spacing: 1.2px; padding: 12px 12px 8px; font-weight: 600; }
+        .sidebar-menu .nav-link { display: flex; align-items: center; gap: 12px;
+            padding: 11px 14px; border-radius: 12px; color: rgba(255,255,255,0.6);
+            text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s ease; margin-bottom: 2px; }
+        .sidebar-menu .nav-link:hover { background: rgba(255,255,255,0.08); color: white; }
+        .sidebar-menu .nav-link.active { background: linear-gradient(135deg, rgba(0,210,255,0.2), rgba(58,123,213,0.2)); color: #00d2ff; }
+        .sidebar-menu .nav-link i { font-size: 18px; width: 22px; text-align: center; }
+        .sidebar-menu .nav-link .badge { margin-left: auto; font-size: 10px; padding: 3px 8px; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-footer .user-info { display: flex; align-items: center; gap: 10px; }
+        .sidebar-footer .user-avatar { width: 38px; height: 38px; border-radius: 10px;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5); display: flex;
+            align-items: center; justify-content: center; color: white; font-weight: 700;
+            font-size: 14px; flex-shrink: 0; }
+        .sidebar-footer .user-name { color: white; font-size: 13px; font-weight: 600; }
+        .sidebar-footer .user-role { color: rgba(255,255,255,0.5); font-size: 11px; }
+
+        /* ── Main ── */
+        .main-content { margin-left: 260px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        .topbar { background: white; padding: 14px 28px; display: flex; align-items: center;
+            justify-content: space-between; border-bottom: 1px solid #e9ecef; position: sticky; top: 0; z-index: 100; }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .btn-toggle-sidebar { display: none; background: none; border: none; font-size: 22px;
+            color: #495057; cursor: pointer; padding: 4px; }
+        .page-title h4 { font-size: 18px; font-weight: 700; color: #1a1a2e; margin: 0; }
+        .page-title small { color: #868e96; font-size: 12px; }
+        .topbar-right { display: flex; align-items: center; gap: 12px; }
+        .topbar-right .btn-icon { width: 40px; height: 40px; border-radius: 10px; border: 1px solid #e9ecef;
+            background: white; display: flex; align-items: center; justify-content: center;
+            color: #495057; font-size: 18px; cursor: pointer; transition: all 0.2s; position: relative; }
+        .topbar-right .btn-icon:hover { background: #f8f9fa; }
+        .topbar-right .btn-icon .notif-dot { position: absolute; top: 8px; right: 8px;
+            width: 8px; height: 8px; background: #ff6b6b; border-radius: 50%; border: 2px solid white; }
+        .content-wrapper { padding: 28px; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%;
+            height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+
+        /* ── Cards ── */
+        .card-custom { background: white; border-radius: 16px; border: 1px solid #e9ecef; overflow: hidden; }
+        .card-custom .card-header-custom { padding: 18px 22px; border-bottom: 1px solid #f1f3f5;
+            display: flex; align-items: center; justify-content: space-between; }
+        .card-custom .card-header-custom h6 { font-size: 15px; font-weight: 700; color: #1a1a2e; margin: 0; }
+        .card-custom .card-body-custom { padding: 22px; }
+
+        /* ── Stats ── */
+        .stat-mini { display: flex; align-items: center; gap: 14px; padding: 18px 20px;
+            background: white; border-radius: 14px; border: 1px solid #e9ecef; transition: all 0.3s; }
+        .stat-mini:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        .stat-mini .stat-icon { width: 46px; height: 46px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .stat-mini .stat-icon.blue   { background: rgba(0,210,255,0.1); color: #00d2ff; }
+        .stat-mini .stat-icon.green  { background: rgba(40,167,69,0.1); color: #28a745; }
+        .stat-mini .stat-icon.orange { background: rgba(255,165,0,0.1); color: #ffa500; }
+        .stat-mini .stat-icon.purple { background: rgba(128,0,255,0.1); color: #8000ff; }
+        .stat-mini .stat-value { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+        .stat-mini .stat-label { font-size: 12px; color: #868e96; }
+
+        /* ── Service table ── */
+        .table-custom { margin-bottom: 0; }
+        .table-custom thead th { background: #f8f9fa; border-bottom: 2px solid #e9ecef;
+            font-size: 12px; font-weight: 700; color: #868e96; text-transform: uppercase;
+            letter-spacing: 0.5px; padding: 12px 16px; }
+        .table-custom tbody td { padding: 14px 16px; font-size: 13px; color: #495057;
+            vertical-align: middle; border-bottom: 1px solid #f1f3f5; }
+        .table-custom tbody tr:hover { background: #f8f9fa; }
+
+        .service-icon-cell { width: 44px; height: 44px; border-radius: 10px;
+            display: inline-flex; align-items: center; justify-content: center; font-size: 20px; }
+        .service-icon-cell.blue   { background: rgba(0,210,255,0.1);  color: #00d2ff; }
+        .service-icon-cell.green  { background: rgba(40,167,69,0.1);  color: #28a745; }
+        .service-icon-cell.orange { background: rgba(255,165,0,0.1);  color: #ffa500; }
+        .service-icon-cell.purple { background: rgba(128,0,255,0.1);  color: #8000ff; }
+        .service-icon-cell.red    { background: rgba(220,53,69,0.1);  color: #dc3545; }
+        .service-icon-cell.teal   { background: rgba(0,128,128,0.1);  color: #008080; }
+
+        .badge-active { background: rgba(40,167,69,0.1); color: #28a745; padding: 4px 10px;
+            border-radius: 8px; font-size: 11px; font-weight: 600; }
+        .badge-inactive { background: rgba(220,53,69,0.1); color: #dc3545; padding: 4px 10px;
+            border-radius: 8px; font-size: 11px; font-weight: 600; }
+
+        .btn-action { width: 34px; height: 34px; border-radius: 8px; border: 1px solid #e9ecef;
+            background: white; display: inline-flex; align-items: center; justify-content: center;
+            font-size: 14px; cursor: pointer; transition: all 0.2s; }
+        .btn-action:hover { background: #f8f9fa; }
+        .btn-action.edit   { color: #00d2ff; border-color: rgba(0,210,255,0.3); }
+        .btn-action.edit:hover { background: rgba(0,210,255,0.08); }
+        .btn-action.delete { color: #dc3545; border-color: rgba(220,53,69,0.3); }
+        .btn-action.delete:hover { background: rgba(220,53,69,0.08); }
+
+        /* ── Modal ── */
+        .modal-content { border-radius: 16px; border: none; }
+        .modal-header { border-bottom: 1px solid #f1f3f5; padding: 20px 24px; }
+        .modal-header .modal-title { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+        .modal-body { padding: 24px; }
+        .modal-footer { border-top: 1px solid #f1f3f5; padding: 16px 24px; }
+
+        .form-label-custom { font-size: 13px; font-weight: 600; color: #495057; margin-bottom: 6px; }
+        .form-control-custom { border: 1px solid #e9ecef; border-radius: 10px; padding: 10px 14px;
+            font-size: 14px; color: #1a1a2e; transition: all 0.2s; width: 100%; }
+        .form-control-custom:focus { border-color: #00d2ff; box-shadow: 0 0 0 3px rgba(0,210,255,0.1); outline: none; }
+
+        select.form-control-custom {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23868e96' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+
+        /* ── Icon Picker ── */
+        .icon-picker { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border: 1px solid #e9ecef;
+            border-radius: 10px; max-height: 120px; overflow-y: auto; }
+        .icon-option { width: 38px; height: 38px; border-radius: 8px; border: 2px solid transparent;
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+            cursor: pointer; transition: all 0.2s; color: #495057; }
+        .icon-option:hover { background: #f8f9fa; border-color: #dee2e6; }
+        .icon-option.selected { border-color: #00d2ff; background: rgba(0,210,255,0.08); color: #00d2ff; }
+
+        /* ── Toast ── */
+        .toast-custom { position: fixed; bottom: 24px; right: 24px; background: #1a1a2e;
+            color: white; padding: 14px 20px; border-radius: 12px; font-size: 14px;
+            display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999; transform: translateY(100px); opacity: 0; transition: all 0.3s ease; }
+        .toast-custom.show { transform: translateY(0); opacity: 1; }
+        .toast-custom i { font-size: 20px; }
+        .toast-custom.success i { color: #28a745; }
+        .toast-custom.error   i { color: #dc3545; }
+
+        /* ── Responsive ── */
+        @media (max-width: 991.98px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.show { transform: translateX(0); }
+            .sidebar-overlay.show { display: block; }
+            .main-content { margin-left: 0; }
+            .btn-toggle-sidebar { display: block; }
+        }
+        @media (max-width: 575.98px) {
+            .content-wrapper { padding: 16px; }
+            .topbar { padding: 12px 16px; }
+            .page-title h4 { font-size: 15px; }
+            .card-custom .card-body-custom { padding: 16px; }
+            .stat-mini { padding: 14px; }
+            .stat-mini .stat-value { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon"><i class="bi bi-droplet-fill"></i></div>
+            <div><h5>LaundryKu</h5><small>Management System</small></div>
+        </div>
+        <nav class="sidebar-menu">
+            <div class="menu-label">Menu Utama</div>
+            <a href="dashboard.html" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+            <a href="kasir.html" class="nav-link"><i class="bi bi-cash-register"></i> Kasir</a>
+            <a href="pesanan.html" class="nav-link"><i class="bi bi-receipt"></i> Pesanan <span class="badge bg-warning text-dark">12</span></a>
+            <a href="layanan.html" class="nav-link active"><i class="bi bi-box-seam"></i> Layanan</a>
+            <div class="menu-label">Pelanggan</div>
+            <a href="#" class="nav-link"><i class="bi bi-people"></i> Daftar Pelanggan</a>
+            <a href="#" class="nav-link"><i class="bi bi-person-plus"></i> Tambah Pelanggan</a>
+            <div class="menu-label">Laporan</div>
+            <a href="laporan.html" class="nav-link"><i class="bi bi-graph-up"></i> Laporan Penjualan</a>
+            <a href="#" class="nav-link"><i class="bi bi-calendar-month"></i> Laporan Bulanan</a>
+            <div class="menu-label">Pengaturan</div>
+            <a href="#" class="nav-link"><i class="bi bi-gear"></i> Settings</a>
+            <a href="#" class="nav-link" id="btnLogout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div>
+                    <div class="user-name" id="userName">Administrator</div>
+                    <div class="user-role">Admin</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="btn-toggle-sidebar" id="toggleSidebar"><i class="bi bi-list"></i></button>
+                <div class="page-title">
+                    <h4>Layanan</h4>
+                    <small>Kelola layanan laundry</small>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="btn btn-sm px-3" style="border-radius:10px; background:linear-gradient(135deg,#00d2ff,#3a7bd5); color:white; font-weight:600; font-size:13px;" id="btnAddService">
+                    <i class="bi bi-plus-lg me-1"></i>Tambah Layanan
+                </button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+
+            <!-- Stats -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-lg-3">
+                    <div class="stat-mini">
+                        <div class="stat-icon blue"><i class="bi bi-box-seam"></i></div>
+                        <div><div class="stat-value" id="totalServices">0</div><div class="stat-label">Total Layanan</div></div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-mini">
+                        <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
+                        <div><div class="stat-value" id="activeServices">0</div><div class="stat-label">Aktif</div></div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-mini">
+                        <div class="stat-icon orange"><i class="bi bi-currency-dollar"></i></div>
+                        <div><div class="stat-value" id="avgPrice">Rp 0</div><div class="stat-label">Rata-rata Harga</div></div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-mini">
+                        <div class="stat-icon purple"><i class="bi bi-star"></i></div>
+                        <div><div class="stat-value" id="popularService">-</div><div class="stat-label">Paling Laris</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="card-custom">
+                <div class="card-header-custom">
+                    <h6><i class="bi bi-list-ul me-2"></i>Daftar Layanan</h6>
+                    <div class="d-flex gap-2">
+                        <input type="text" class="form-control-custom" id="searchService" placeholder="Cari layanan..." style="width:200px; padding:8px 12px; font-size:13px;">
+                    </div>
+                </div>
+                <div class="card-body-custom p-0">
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Layanan</th>
+                                    <th>Harga/kg</th>
+                                    <th>Estimasi</th>
+                                    <th>Status</th>
+                                    <th>Dipesan</th>
+                                    <th style="width:100px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="serviceTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Add/Edit -->
+    <div class="modal fade" id="serviceModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Tambah Layanan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editId">
+                    <div class="mb-3">
+                        <label class="form-label-custom">Nama Layanan</label>
+                        <input type="text" class="form-control-custom" id="svcName" placeholder="Contoh: Cuci Kering">
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label-custom">Harga per Kg (Rp)</label>
+                            <input type="number" class="form-control-custom" id="svcPrice" placeholder="10000" min="0">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label-custom">Estimasi Waktu</label>
+                            <select class="form-control-custom" id="svcEstimate">
+                                <option value="1 hari">1 Hari</option>
+                                <option value="2 hari">2 Hari</option>
+                                <option value="3 hari" selected>3 Hari</option>
+                                <option value="5 hari">5 Hari</option>
+                                <option value="7 hari">7 Hari</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label-custom">Deskripsi</label>
+                        <input type="text" class="form-control-custom" id="svcDesc" placeholder="Deskripsi singkat layanan">
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label-custom">Icon</label>
+                            <div class="icon-picker" id="iconPicker"></div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label-custom">Warna</label>
+                            <div class="d-flex gap-2 flex-wrap mt-1" id="colorPicker"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label-custom">Status</label>
+                        <select class="form-control-custom" id="svcStatus">
+                            <option value="active">Aktif</option>
+                            <option value="inactive">Nonaktif</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm px-3" style="border-radius:10px; border:1px solid #e9ecef; color:#495057;" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-sm px-3" style="border-radius:10px; background:linear-gradient(135deg,#00d2ff,#3a7bd5); color:white; font-weight:600;" id="btnSaveService">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-custom" id="toast"><i class="bi bi-check-circle-fill"></i><span id="toastText"></span></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        if (sessionStorage.getItem('loggedIn') !== 'true') { window.location.href = 'index.html'; return; }
+        const userData = JSON.parse(sessionStorage.getItem('user'));
+        if (userData) {
+            document.getElementById('userName').textContent = userData.name;
+            document.getElementById('userAvatar').textContent = userData.name.charAt(0).toUpperCase();
+        }
+
+        // ── Sidebar ──
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            sidebar.classList.toggle('show'); overlay.classList.toggle('show');
+        });
+        overlay.addEventListener('click', function() { sidebar.classList.remove('show'); overlay.classList.remove('show'); });
+
+        document.getElementById('btnLogout').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Yakin ingin keluar?')) { sessionStorage.clear(); window.location.href = 'index.html'; }
+        });
+
+        // ── Data ──
+        const ICONS = ['bi-droplet','bi-fire','bi-lightning','bi-wind','bi-foot','bi-cloud','bi-stars','bi-sun','bi-moon','bi-heart','bi-gem','bi-gift','bi-star','bi-tshirt','bi-basket','bi-truck'];
+        const COLORS = [
+            { name: 'blue',   value: '#00d2ff' },
+            { name: 'green',  value: '#28a745' },
+            { name: 'orange', value: '#ffa500' },
+            { name: 'purple', value: '#8000ff' },
+            { name: 'red',    value: '#dc3545' },
+            { name: 'teal',   value: '#008080' }
+        ];
+
+        let services = JSON.parse(localStorage.getItem('laundryServices')) || [
+            { id: 1, name: 'Cuci Kering',   icon: 'bi-droplet',  color: 'blue',   price: 10000, estimate: '1 hari', desc: 'Cuci dan keringkan saja', status: 'active', orders: 342 },
+            { id: 2, name: 'Cuci Setrika',   icon: 'bi-fire',     color: 'orange', price: 12000, estimate: '2 hari', desc: 'Cuci, keringkan, dan setrika', status: 'active', orders: 528 },
+            { id: 3, name: 'Setrika Saja',   icon: 'bi-lightning', color: 'purple', price: 7000,  estimate: '1 hari', desc: 'Setrika tanpa cuci', status: 'active', orders: 189 },
+            { id: 4, name: 'Dry Clean',      icon: 'bi-wind',     color: 'teal',   price: 20000, estimate: '3 hari', desc: 'Pembersihan kering profesional', status: 'active', orders: 97 },
+            { id: 5, name: 'Cuci Sepatu',    icon: 'bi-foot',     color: 'red',    price: 25000, estimate: '5 hari', desc: 'Cuci dan bersihkan sepatu', status: 'active', orders: 64 },
+            { id: 6, name: 'Cuci Selimut',   icon: 'bi-cloud',    color: 'green',  price: 15000, estimate: '3 hari', desc: 'Cuci selimut dan sprei besar', status: 'inactive', orders: 45 },
+        ];
+
+        let selectedIcon = ICONS[0];
+        let selectedColor = COLORS[0].name;
+
+        function saveServices() { localStorage.setItem('laundryServices', JSON.stringify(services)); }
+
+        // ── Icon & Color Picker ──
+        const iconPickerEl = document.getElementById('iconPicker');
+        ICONS.forEach(function(ic) {
+            const div = document.createElement('div');
+            div.className = 'icon-option' + (ic === selectedIcon ? ' selected' : '');
+            div.innerHTML = '<i class="bi ' + ic + '"></i>';
+            div.addEventListener('click', function() {
+                iconPickerEl.querySelectorAll('.icon-option').forEach(function(e) { e.classList.remove('selected'); });
+                div.classList.add('selected');
+                selectedIcon = ic;
+            });
+            iconPickerEl.appendChild(div);
+        });
+
+        const colorPickerEl = document.getElementById('colorPicker');
+        COLORS.forEach(function(c) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'rounded-circle border-0';
+            btn.style.cssText = 'width:32px;height:32px;background:' + c.value + ';cursor:pointer;transition:all 0.2s;' + (c.name === selectedColor ? 'box-shadow:0 0 0 3px white, 0 0 0 5px ' + c.value + ';' : '');
+            btn.title = c.name;
+            btn.addEventListener('click', function() {
+                colorPickerEl.querySelectorAll('button').forEach(function(b) { b.style.boxShadow = ''; });
+                btn.style.boxShadow = '0 0 0 3px white, 0 0 0 5px ' + c.value;
+                selectedColor = c.name;
+            });
+            colorPickerEl.appendChild(btn);
+        });
+
+        // ── Render ──
+        const serviceTable = document.getElementById('serviceTable');
+        const modal = new bootstrap.Modal(document.getElementById('serviceModal'));
+
+        function render(filter) {
+            let list = services;
+            if (filter) {
+                const q = filter.toLowerCase();
+                list = services.filter(function(s) { return s.name.toLowerCase().includes(q) || s.desc.toLowerCase().includes(q); });
+            }
+
+            serviceTable.innerHTML = '';
+            list.forEach(function(svc) {
+                const tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td><div class="d-flex align-items-center gap-3">' +
+                        '<div class="service-icon-cell ' + svc.color + '"><i class="bi ' + svc.icon + '"></i></div>' +
+                        '<div><div style="font-weight:600; color:#1a1a2e;">' + svc.name + '</div>' +
+                        '<div style="font-size:11px; color:#868e96;">' + svc.desc + '</div></div>' +
+                    '</div></td>' +
+                    '<td><strong>Rp ' + svc.price.toLocaleString('id-ID') + '</strong></td>' +
+                    '<td>' + svc.estimate + '</td>' +
+                    '<td><span class="' + (svc.status === 'active' ? 'badge-active' : 'badge-inactive') + '">' + (svc.status === 'active' ? 'Aktif' : 'Nonaktif') + '</span></td>' +
+                    '<td>' + svc.orders + 'x</td>' +
+                    '<td><div class="d-flex gap-1">' +
+                        '<button class="btn-action edit" data-id="' + svc.id + '" title="Edit"><i class="bi bi-pencil"></i></button>' +
+                        '<button class="btn-action delete" data-id="' + svc.id + '" title="Hapus"><i class="bi bi-trash3"></i></button>' +
+                    '</div></td>';
+                serviceTable.appendChild(tr);
+            });
+
+            updateStats();
+
+            serviceTable.querySelectorAll('.btn-action.edit').forEach(function(btn) {
+                btn.addEventListener('click', function() { openModal(parseInt(this.dataset.id)); });
+            });
+            serviceTable.querySelectorAll('.btn-action.delete').forEach(function(btn) {
+                btn.addEventListener('click', function() { deleteService(parseInt(this.dataset.id)); });
+            });
+        }
+
+        function updateStats() {
+            const active = services.filter(function(s) { return s.status === 'active'; });
+            const avg = services.length ? Math.round(services.reduce(function(s, v) { return s + v.price; }, 0) / services.length) : 0;
+            const popular = services.length ? services.reduce(function(a, b) { return a.orders > b.orders ? a : b; }) : null;
+
+            document.getElementById('totalServices').textContent = services.length;
+            document.getElementById('activeServices').textContent = active.length;
+            document.getElementById('avgPrice').textContent = 'Rp ' + avg.toLocaleString('id-ID');
+            document.getElementById('popularService').textContent = popular ? popular.name : '-';
+        }
+
+        // ── Modal ──
+        document.getElementById('btnAddService').addEventListener('click', function() {
+            document.getElementById('modalTitle').textContent = 'Tambah Layanan';
+            document.getElementById('editId').value = '';
+            document.getElementById('svcName').value = '';
+            document.getElementById('svcPrice').value = '';
+            document.getElementById('svcDesc').value = '';
+            document.getElementById('svcEstimate').value = '3 hari';
+            document.getElementById('svcStatus').value = 'active';
+            selectedIcon = ICONS[0];
+            selectedColor = COLORS[0].name;
+            refreshPickers();
+            modal.show();
+        });
+
+        function openModal(id) {
+            const svc = services.find(function(s) { return s.id === id; });
+            if (!svc) return;
+            document.getElementById('modalTitle').textContent = 'Edit Layanan';
+            document.getElementById('editId').value = svc.id;
+            document.getElementById('svcName').value = svc.name;
+            document.getElementById('svcPrice').value = svc.price;
+            document.getElementById('svcDesc').value = svc.desc;
+            document.getElementById('svcEstimate').value = svc.estimate;
+            document.getElementById('svcStatus').value = svc.status;
+            selectedIcon = svc.icon;
+            selectedColor = svc.color;
+            refreshPickers();
+            modal.show();
+        }
+
+        function refreshPickers() {
+            iconPickerEl.querySelectorAll('.icon-option').forEach(function(el) {
+                el.classList.toggle('selected', el.querySelector('i').classList.contains(selectedIcon));
+            });
+            colorPickerEl.querySelectorAll('button').forEach(function(btn, i) {
+                btn.style.boxShadow = COLORS[i].name === selectedColor ? '0 0 0 3px white, 0 0 0 5px ' + COLORS[i].value : '';
+            });
+        }
+
+        document.getElementById('btnSaveService').addEventListener('click', function() {
+            const name = document.getElementById('svcName').value.trim();
+            const price = parseInt(document.getElementById('svcPrice').value);
+            const desc = document.getElementById('svcDesc').value.trim();
+            const estimate = document.getElementById('svcEstimate').value;
+            const status = document.getElementById('svcStatus').value;
+            const editId = document.getElementById('editId').value;
+
+            if (!name) { showToast('Nama layanan wajib diisi!', 'error'); return; }
+            if (!price || price <= 0) { showToast('Harga harus lebih dari 0!', 'error'); return; }
+
+            if (editId) {
+                const svc = services.find(function(s) { return s.id === parseInt(editId); });
+                if (svc) {
+                    svc.name = name;
+                    svc.price = price;
+                    svc.desc = desc || '-';
+                    svc.estimate = estimate;
+                    svc.status = status;
+                    svc.icon = selectedIcon;
+                    svc.color = selectedColor;
+                }
+                showToast('Layanan berhasil diperbarui!', 'success');
+            } else {
+                const newId = services.length ? Math.max.apply(null, services.map(function(s) { return s.id; })) + 1 : 1;
+                services.push({
+                    id: newId, name: name, icon: selectedIcon, color: selectedColor,
+                    price: price, estimate: estimate, desc: desc || '-', status: status, orders: 0
+                });
+                showToast('Layanan baru berhasil ditambahkan!', 'success');
+            }
+
+            saveServices();
+            render(document.getElementById('searchService').value);
+            modal.hide();
+        });
+
+        function deleteService(id) {
+            const svc = services.find(function(s) { return s.id === id; });
+            if (!svc) return;
+            if (!confirm('Hapus layanan "' + svc.name + '"?')) return;
+            services = services.filter(function(s) { return s.id !== id; });
+            saveServices();
+            render(document.getElementById('searchService').value);
+            showToast('Layanan berhasil dihapus!', 'error');
+        }
+
+        // ── Search ──
+        document.getElementById('searchService').addEventListener('input', function() { render(this.value); });
+
+        // ── Toast ──
+        function showToast(msg, type) {
+            const t = document.getElementById('toast');
+            t.className = 'toast-custom ' + type;
+            t.querySelector('i').className = type === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill';
+            document.getElementById('toastText').textContent = msg;
+            t.classList.add('show');
+            setTimeout(function() { t.classList.remove('show'); }, 3000);
+        }
+
+        render();
+    });
+    </script>
+</body>
+</html>

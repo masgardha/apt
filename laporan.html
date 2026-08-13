@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Penjualan - LaundryKu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-brand .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand .brand-icon i { font-size: 20px; color: white; }
+        .sidebar-brand h5 { color: white; font-size: 16px; font-weight: 700; margin: 0; }
+        .sidebar-brand small { color: rgba(255,255,255,0.5); font-size: 11px; }
+
+        .sidebar-menu { padding: 16px 12px; }
+
+        .sidebar-menu .menu-label {
+            color: rgba(255,255,255,0.35);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 12px 12px 8px;
+            font-weight: 600;
+        }
+
+        .sidebar-menu .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 12px;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 2px;
+        }
+
+        .sidebar-menu .nav-link:hover { background: rgba(255,255,255,0.08); color: white; }
+        .sidebar-menu .nav-link.active {
+            background: linear-gradient(135deg, rgba(0,210,255,0.2), rgba(58,123,213,0.2));
+            color: #00d2ff;
+        }
+
+        .sidebar-menu .nav-link i { font-size: 18px; width: 22px; text-align: center; }
+
+        .sidebar-menu .nav-link .badge {
+            margin-left: auto;
+            font-size: 10px;
+            padding: 3px 8px;
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-footer .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-footer .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer .user-name { color: white; font-size: 13px; font-weight: 600; }
+        .sidebar-footer .user-role { color: rgba(255,255,255,0.5); font-size: 11px; }
+
+        /* ── Main ── */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .topbar {
+            background: white;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+
+        .btn-toggle-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #495057;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .page-title h4 { font-size: 18px; font-weight: 700; color: #1a1a2e; margin: 0; }
+        .page-title small { color: #868e96; font-size: 12px; }
+
+        .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+        .topbar-right .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #495057;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .topbar-right .btn-icon:hover { background: #f8f9fa; }
+
+        .content-wrapper { padding: 28px; }
+
+        /* ── Sidebar overlay ── */
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+
+        /* ── Card Custom ── */
+        .card-custom {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e9ecef;
+            overflow: hidden;
+        }
+
+        .card-custom .card-header-custom {
+            padding: 18px 22px;
+            border-bottom: 1px solid #f1f3f5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-custom .card-header-custom h6 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin: 0;
+        }
+
+        .card-custom .card-body-custom { padding: 22px; }
+
+        /* ── Filter Section ── */
+        .filter-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .filter-card .filter-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-card .filter-title i {
+            color: #00d2ff;
+        }
+
+        .date-input-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .date-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-input-wrapper label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #495057;
+            white-space: nowrap;
+        }
+
+        .date-input-wrapper input[type="date"] {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 14px;
+            color: #1a1a2e;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .date-input-wrapper input[type="date"]:focus {
+            border-color: #00d2ff;
+            box-shadow: 0 0 0 3px rgba(0,210,255,0.1);
+        }
+
+        .date-separator {
+            font-size: 14px;
+            color: #868e96;
+            font-weight: 500;
+        }
+
+        .btn-filter {
+            height: 42px;
+            padding: 0 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,210,255,0.3);
+        }
+
+        .btn-reset {
+            height: 42px;
+            padding: 0 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background: white;
+            color: #495057;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-reset:hover {
+            border-color: #dc3545;
+            color: #dc3545;
+            background: rgba(220,53,69,0.05);
+        }
+
+        .quick-dates {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .quick-date-btn {
+            padding: 6px 14px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            color: #495057;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-date-btn:hover,
+        .quick-date-btn.active {
+            border-color: #00d2ff;
+            color: #00d2ff;
+            background: rgba(0,210,255,0.05);
+        }
+
+        /* ── Stats ── */
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 22px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .stat-card .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 14px;
+        }
+
+        .stat-card .stat-icon.blue   { background: rgba(0,210,255,0.1);  color: #00d2ff; }
+        .stat-card .stat-icon.green  { background: rgba(40,167,69,0.1);  color: #28a745; }
+        .stat-card .stat-icon.orange { background: rgba(255,165,0,0.1);  color: #ffa500; }
+        .stat-card .stat-icon.purple { background: rgba(128,0,255,0.1);  color: #8000ff; }
+
+        .stat-card .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: #868e96;
+            font-weight: 500;
+        }
+
+        /* ── Chart ── */
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 250px;
+            padding: 20px 0;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .bar-chart .bar-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bar-chart .bar {
+            width: 100%;
+            max-width: 50px;
+            border-radius: 8px 8px 0 0;
+            background: linear-gradient(180deg, #00d2ff, #3a7bd5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .bar-chart .bar:hover {
+            opacity: 0.8;
+            transform: scaleY(1.02);
+            transform-origin: bottom;
+        }
+
+        .bar-chart .bar .tooltip {
+            display: none;
+            position: absolute;
+            top: -36px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a2e;
+            color: white;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .bar-chart .bar:hover .tooltip { display: block; }
+
+        .bar-labels {
+            display: flex;
+            gap: 6px;
+            padding-top: 12px;
+        }
+
+        .bar-labels span {
+            flex: 1;
+            text-align: center;
+            font-size: 11px;
+            color: #868e96;
+            font-weight: 500;
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 16px;
+        }
+
+        .chart-legend .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #495057;
+        }
+
+        .chart-legend .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+        }
+
+        /* ── Table ── */
+        .table-custom {
+            margin-bottom: 0;
+        }
+
+        .table-custom thead th {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            font-size: 12px;
+            font-weight: 700;
+            color: #868e96;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 16px;
+        }
+
+        .table-custom tbody td {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #495057;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .table-custom tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge-status {
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-status.selesai  { background: rgba(40,167,69,0.1);  color: #28a745; }
+        .badge-status.proses   { background: rgba(0,210,255,0.1);  color: #00b4d8; }
+        .badge-status.antrian  { background: rgba(255,165,0,0.1);  color: #e67e00; }
+        .badge-status.batal    { background: rgba(220,53,69,0.1);  color: #dc3545; }
+
+        .payment-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #f1f3f5;
+            color: #495057;
+        }
+
+        .payment-badge.cash     { background: rgba(40,167,69,0.1);  color: #28a745; }
+        .payment-badge.transfer { background: rgba(0,210,255,0.1);  color: #00b4d8; }
+        .payment-badge.ewallet  { background: rgba(128,0,255,0.1);  color: #8000ff; }
+
+        /* ── Service Summary ── */
+        .service-summary-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .service-summary-item:last-child { border-bottom: none; }
+
+        .service-summary-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .service-summary-icon.blue   { background: rgba(0,210,255,0.1);  color: #00d2ff; }
+        .service-summary-icon.green  { background: rgba(40,167,69,0.1);  color: #28a745; }
+        .service-summary-icon.orange { background: rgba(255,165,0,0.1);  color: #ffa500; }
+        .service-summary-icon.purple { background: rgba(128,0,255,0.1);  color: #8000ff; }
+        .service-summary-icon.red    { background: rgba(220,53,69,0.1);  color: #dc3545; }
+        .service-summary-icon.teal   { background: rgba(0,128,128,0.1);  color: #008080; }
+
+        .service-summary-info { flex: 1; }
+
+        .service-summary-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 2px;
+        }
+
+        .service-summary-count {
+            font-size: 12px;
+            color: #868e96;
+        }
+
+        .service-summary-revenue {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .service-summary-bar {
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .service-summary-bar .fill {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            transition: width 0.5s ease;
+        }
+
+        /* ── Export Button ── */
+        .btn-export {
+            padding: 8px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            background: white;
+            color: #495057;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-export:hover {
+            border-color: #00d2ff;
+            color: #00d2ff;
+            background: rgba(0,210,255,0.05);
+        }
+
+        /* ── Empty State ── */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #adb5bd;
+        }
+
+        .empty-state i { font-size: 48px; margin-bottom: 12px; display: block; }
+        .empty-state p { font-size: 14px; }
+
+        /* ── Toast ── */
+        .toast-custom {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1a1a2e;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast-custom.show { transform: translateY(0); opacity: 1; }
+        .toast-custom i { font-size: 20px; }
+        .toast-custom.success i { color: #28a745; }
+
+        /* ── Pagination ── */
+        .pagination-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+        }
+
+        .pagination-info {
+            font-size: 13px;
+            color: #868e96;
+        }
+
+        .pagination-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .pagination-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            color: #495057;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pagination-btn:hover,
+        .pagination-btn.active {
+            border-color: #00d2ff;
+            color: #00d2ff;
+            background: rgba(0,210,255,0.05);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 991.98px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.show { transform: translateX(0); }
+            .sidebar-overlay.show { display: block; }
+            .main-content { margin-left: 0; }
+            .btn-toggle-sidebar { display: block; }
+        }
+
+        @media (max-width: 767.98px) {
+            .date-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .date-input-wrapper {
+                width: 100%;
+            }
+
+            .date-input-wrapper input[type="date"] {
+                flex: 1;
+            }
+
+            .date-separator { display: none; }
+
+            .filter-actions {
+                display: flex;
+                gap: 8px;
+            }
+
+            .btn-filter, .btn-reset {
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .content-wrapper { padding: 16px; }
+            .topbar { padding: 12px 16px; }
+            .page-title h4 { font-size: 15px; }
+            .card-custom .card-body-custom { padding: 16px; }
+            .stat-card { padding: 16px; }
+            .stat-card .stat-value { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon"><i class="bi bi-droplet-fill"></i></div>
+            <div>
+                <h5>LaundryKu</h5>
+                <small>Management System</small>
+            </div>
+        </div>
+        <nav class="sidebar-menu">
+            <div class="menu-label">Menu Utama</div>
+            <a href="dashboard.html" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+            <a href="kasir.html" class="nav-link"><i class="bi bi-cash-register"></i> Kasir</a>
+            <a href="pesanan.html" class="nav-link"><i class="bi bi-receipt"></i> Pesanan <span class="badge bg-warning text-dark">12</span></a>
+            <a href="layanan.html" class="nav-link"><i class="bi bi-box-seam"></i> Layanan</a>
+
+            <div class="menu-label">Pelanggan</div>
+            <a href="#" class="nav-link"><i class="bi bi-people"></i> Daftar Pelanggan</a>
+
+            <div class="menu-label">Laporan</div>
+            <a href="laporan.html" class="nav-link active"><i class="bi bi-graph-up"></i> Laporan Penjualan</a>
+
+            <div class="menu-label">Pengaturan</div>
+            <a href="#" class="nav-link"><i class="bi bi-gear"></i> Settings</a>
+            <a href="#" class="nav-link" id="btnLogout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div>
+                    <div class="user-name" id="userName">Administrator</div>
+                    <div class="user-role">Admin</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="btn-toggle-sidebar" id="toggleSidebar"><i class="bi bi-list"></i></button>
+                <div class="page-title">
+                    <h4>Laporan Penjualan</h4>
+                    <small id="currentDate">Loading...</small>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="btn-icon" title="Cetak Laporan" onclick="window.print()">
+                    <i class="bi bi-printer"></i>
+                </button>
+                <button class="btn-icon" title="Export PDF" id="btnExportPDF">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+
+            <!-- Filter Section -->
+            <div class="filter-card">
+                <div class="filter-title">
+                    <i class="bi bi-funnel"></i>
+                    Filter Periode Laporan
+                </div>
+                <div class="date-input-group">
+                    <div class="date-input-wrapper">
+                        <label for="startDate">Dari:</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    <span class="date-separator">-</span>
+                    <div class="date-input-wrapper">
+                        <label for="endDate">Sampai:</label>
+                        <input type="date" id="endDate">
+                    </div>
+                    <button class="btn-filter" id="btnFilter">
+                        <i class="bi bi-search"></i> Terapkan
+                    </button>
+                    <button class="btn-reset" id="btnReset">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    </button>
+                </div>
+                <div class="quick-dates">
+                    <button class="quick-date-btn" data-range="today">Hari Ini</button>
+                    <button class="quick-date-btn" data-range="yesterday">Kemarin</button>
+                    <button class="quick-date-btn" data-range="7days">7 Hari Terakhir</button>
+                    <button class="quick-date-btn active" data-range="30days">30 Hari Terakhir</button>
+                    <button class="quick-date-btn" data-range="thisMonth">Bulan Ini</button>
+                    <button class="quick-date-btn" data-range="lastMonth">Bulan Lalu</button>
+                    <button class="quick-date-btn" data-range="thisYear">Tahun Ini</button>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="bi bi-receipt"></i>
+                        </div>
+                        <div class="stat-value" id="statTotalOrders">0</div>
+                        <div class="stat-label">Total Pesanan</div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                        <div class="stat-value" id="statRevenue">Rp 0</div>
+                        <div class="stat-label">Total Pendapatan</div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <div class="stat-value" id="statAvgOrder">Rp 0</div>
+                        <div class="stat-label">Rata-rata per Pesanan</div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div class="stat-value" id="statCompleted">0</div>
+                        <div class="stat-label">Pesanan Selesai</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart + Service Summary -->
+            <div class="row g-3 mb-4">
+                <div class="col-lg-8">
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <h6><i class="bi bi-bar-chart-line me-2"></i>Pendapatan Harian</h6>
+                            <span class="badge bg-light text-dark" id="chartPeriodLabel">30 Hari Terakhir</span>
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="chart-container">
+                                <div class="bar-chart" id="salesChart"></div>
+                                <div class="bar-labels" id="chartLabels"></div>
+                            </div>
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background: linear-gradient(180deg, #00d2ff, #3a7bd5);"></div>
+                                    <span>Pendapatan</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card-custom" style="height: 100%;">
+                        <div class="card-header-custom">
+                            <h6><i class="bi bi-box-seam me-2"></i>Ringkasan Layanan</h6>
+                        </div>
+                        <div class="card-body-custom" id="serviceSummary">
+                            <!-- Rendered by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Table -->
+            <div class="card-custom">
+                <div class="card-header-custom">
+                    <h6><i class="bi bi-list-ul me-2"></i>Detail Transaksi</h6>
+                    <button class="btn-export" id="btnExportCSV">
+                        <i class="bi bi-download"></i> Export CSV
+                    </button>
+                </div>
+                <div class="card-body-custom p-0">
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>No. Pesanan</th>
+                                    <th>Tanggal</th>
+                                    <th>Pelanggan</th>
+                                    <th>Layanan</th>
+                                    <th>Berat</th>
+                                    <th>Subtotal</th>
+                                    <th>Diskon</th>
+                                    <th>Total</th>
+                                    <th>Pembayaran</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionTable">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="emptyState" class="empty-state" style="display:none;">
+                        <i class="bi bi-inbox"></i>
+                        <p>Tidak ada data transaksi untuk periode ini</p>
+                    </div>
+                </div>
+                <div class="card-body-custom" id="paginationArea" style="border-top: 1px solid #f1f3f5;">
+                    <div class="pagination-wrapper">
+                        <div class="pagination-info" id="paginationInfo">Menampilkan 0 dari 0 transaksi</div>
+                        <div class="pagination-btns" id="paginationBtns"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Toast -->
+    <div class="toast-custom" id="toast">
+        <i class="bi bi-check-circle-fill"></i>
+        <span id="toastText"></span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // ── Session ──
+        if (sessionStorage.getItem('loggedIn') !== 'true') {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        const userData = JSON.parse(sessionStorage.getItem('user'));
+        if (userData) {
+            document.getElementById('userName').textContent = userData.name;
+            document.getElementById('userAvatar').textContent = userData.name.charAt(0).toUpperCase();
+        }
+
+        // ── Date ──
+        const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', opts);
+
+        // ── Sidebar ──
+        const sidebar  = document.getElementById('sidebar');
+        const overlay  = document.getElementById('sidebarOverlay');
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+        });
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+        });
+
+        // ── Logout ──
+        document.getElementById('btnLogout').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Yakin ingin keluar?')) {
+                sessionStorage.clear();
+                window.location.href = 'index.html';
+            }
+        });
+
+        // ── Services Config ──
+        const services = [
+            { id: 1, name: 'Cuci Kering',   icon: 'bi-droplet',  color: 'blue',   pricePerKg: 10000 },
+            { id: 2, name: 'Cuci Setrika',   icon: 'bi-fire',     color: 'orange', pricePerKg: 12000 },
+            { id: 3, name: 'Setrika Saja',   icon: 'bi-lightning', color: 'purple', pricePerKg: 7000  },
+            { id: 4, name: 'Dry Clean',      icon: 'bi-wind',     color: 'teal',   pricePerKg: 20000 },
+            { id: 5, name: 'Cuci Sepatu',    icon: 'bi-foot',     color: 'red',    pricePerKg: 25000 },
+            { id: 6, name: 'Cuci Selimut',   icon: 'bi-cloud',    color: 'green',  pricePerKg: 15000 },
+        ];
+
+        // ── Generate Demo Data ──
+        function generateDemoData() {
+            var history = JSON.parse(sessionStorage.getItem('orderHistory') || '[]');
+            if (history.length > 0) return history;
+
+            var demoData = [];
+            var customerNames = [
+                'Budi Santoso', 'Sari Dewi', 'Andi Wijaya', 'Rina Marlina', 'Dedi Kurniawan',
+                'Maya Putri', 'Rizky Pratama', 'Lestari Budiman', 'Farhan Ahmad', 'Diana Sari',
+                'Heri Purnomo', 'Nina Agustina', 'Tono Sugiarto', 'Ratna Dewi', 'Joko Widodo'
+            ];
+            var statuses = ['selesai', 'selesai', 'selesai', 'selesai', 'proses', 'antrian', 'batal'];
+            var payments = ['cash', 'cash', 'cash', 'transfer', 'ewallet'];
+
+            var today = new Date();
+            var sixMonthsAgo = new Date(today);
+            sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+            for (var i = 0; i < 200; i++) {
+                var randomDate = new Date(sixMonthsAgo.getTime() + Math.random() * (today.getTime() - sixMonthsAgo.getTime()));
+                var service = services[Math.floor(Math.random() * services.length)];
+                var weight = Math.round((Math.random() * 8 + 0.5) * 2) / 2;
+                var subtotal = Math.round(weight * service.pricePerKg);
+                var discount = Math.random() > 0.8 ? Math.round(subtotal * (Math.random() * 0.15 + 0.05)) : 0;
+                var total = subtotal - discount;
+
+                demoData.push({
+                    id: 'LG-' + String(1000 + i).padStart(4, '0'),
+                    customer: customerNames[Math.floor(Math.random() * customerNames.length)],
+                    phone: '08' + Math.floor(Math.random() * 9000000000 + 1000000000),
+                    items: [{
+                        service: service.name,
+                        icon: service.icon,
+                        weight: weight,
+                        pricePerKg: service.pricePerKg,
+                        subtotal: subtotal,
+                        note: ''
+                    }],
+                    subtotal: subtotal,
+                    discount: discount,
+                    total: total,
+                    payment: payments[Math.floor(Math.random() * payments.length)],
+                    status: statuses[Math.floor(Math.random() * statuses.length)],
+                    date: randomDate.toISOString()
+                });
+            }
+
+            demoData.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+            sessionStorage.setItem('orderHistory', JSON.stringify(demoData));
+            return demoData;
+        }
+
+        var allTransactions = generateDemoData();
+        var filteredTransactions = [];
+        var currentPage = 1;
+        var itemsPerPage = 10;
+
+        // ── Date Helpers ──
+        function formatDate(dateStr) {
+            var d = new Date(dateStr);
+            return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function formatDateShort(dateStr) {
+            var d = new Date(dateStr);
+            return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+        }
+
+        function toDateString(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        // ── Initialize Dates ──
+        var today = new Date();
+        var thirtyDaysAgo = new Date(today);
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        document.getElementById('startDate').value = toDateString(thirtyDaysAgo);
+        document.getElementById('endDate').value = toDateString(today);
+
+        // ── Quick Date Buttons ──
+        document.querySelectorAll('.quick-date-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.quick-date-btn').forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+
+                var range = btn.dataset.range;
+                var start = new Date();
+                var end = new Date();
+
+                switch(range) {
+                    case 'today':
+                        break;
+                    case 'yesterday':
+                        start.setDate(start.getDate() - 1);
+                        end.setDate(end.getDate() - 1);
+                        break;
+                    case '7days':
+                        start.setDate(start.getDate() - 6);
+                        break;
+                    case '30days':
+                        start.setDate(start.getDate() - 29);
+                        break;
+                    case 'thisMonth':
+                        start = new Date(today.getFullYear(), today.getMonth(), 1);
+                        break;
+                    case 'lastMonth':
+                        start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                        end = new Date(today.getFullYear(), today.getMonth(), 0);
+                        break;
+                    case 'thisYear':
+                        start = new Date(today.getFullYear(), 0, 1);
+                        break;
+                }
+
+                document.getElementById('startDate').value = toDateString(start);
+                document.getElementById('endDate').value = toDateString(end);
+                filterData();
+            });
+        });
+
+        // ── Filter Button ──
+        document.getElementById('btnFilter').addEventListener('click', filterData);
+        document.getElementById('btnReset').addEventListener('click', function() {
+            var thirtyDaysAgo = new Date(today);
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            document.getElementById('startDate').value = toDateString(thirtyDaysAgo);
+            document.getElementById('endDate').value = toDateString(today);
+            document.querySelectorAll('.quick-date-btn').forEach(function(b) { b.classList.remove('active'); });
+            document.querySelector('[data-range="30days"]').classList.add('active');
+            filterData();
+        });
+
+        function filterData() {
+            var start = new Date(document.getElementById('startDate').value + 'T00:00:00');
+            var end = new Date(document.getElementById('endDate').value + 'T23:59:59');
+
+            if (start > end) {
+                showToast('Tanggal awal tidak boleh lebih besar dari tanggal akhir!', 'error');
+                return;
+            }
+
+            filteredTransactions = allTransactions.filter(function(tx) {
+                var txDate = new Date(tx.date);
+                return txDate >= start && txDate <= end;
+            });
+
+            filteredTransactions.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+
+            currentPage = 1;
+            updateStats();
+            renderChart();
+            renderServiceSummary();
+            renderTable();
+        }
+
+        // ── Update Stats ──
+        function updateStats() {
+            var totalOrders = filteredTransactions.length;
+            var totalRevenue = filteredTransactions.reduce(function(sum, tx) { return sum + tx.total; }, 0);
+            var avgOrder = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
+            var completed = filteredTransactions.filter(function(tx) { return tx.status === 'selesai'; }).length;
+
+            document.getElementById('statTotalOrders').textContent = totalOrders;
+            document.getElementById('statRevenue').textContent = 'Rp ' + totalRevenue.toLocaleString('id-ID');
+            document.getElementById('statAvgOrder').textContent = 'Rp ' + avgOrder.toLocaleString('id-ID');
+            document.getElementById('statCompleted').textContent = completed;
+        }
+
+        // ── Render Chart ──
+        function renderChart() {
+            var chartEl = document.getElementById('salesChart');
+            var labelsEl = document.getElementById('chartLabels');
+            chartEl.innerHTML = '';
+            labelsEl.innerHTML = '';
+
+            var dailyData = {};
+            filteredTransactions.forEach(function(tx) {
+                var dateKey = tx.date.split('T')[0];
+                if (!dailyData[dateKey]) dailyData[dateKey] = 0;
+                dailyData[dateKey] += tx.total;
+            });
+
+            var dates = Object.keys(dailyData).sort();
+            if (dates.length === 0) {
+                chartEl.innerHTML = '<div class="empty-state" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><p>Tidak ada data</p></div>';
+                return;
+            }
+
+            // If too many dates, group by week or month
+            var displayDates = dates;
+            var displayValues = dates.map(function(d) { return dailyData[d]; });
+            var labels = dates.map(function(d) { return formatDateShort(d); });
+
+            // Limit to 30 bars max
+            if (displayDates.length > 30) {
+                var grouped = {};
+                var groupedLabels = {};
+                displayDates.forEach(function(d, i) {
+                    var weekStart = new Date(d);
+                    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+                    var key = toDateString(weekStart);
+                    if (!grouped[key]) grouped[key] = 0;
+                    grouped[key] += displayValues[i];
+                    groupedLabels[key] = formatDateShort(key);
+                });
+                displayDates = Object.keys(grouped);
+                displayValues = displayDates.map(function(d) { return grouped[d]; });
+                labels = displayDates.map(function(d) { return groupedLabels[d]; });
+            }
+
+            var maxVal = Math.max.apply(null, displayValues);
+
+            displayValues.forEach(function(val, i) {
+                var pct = maxVal > 0 ? (val / maxVal) * 100 : 0;
+                var barWrapper = document.createElement('div');
+                barWrapper.className = 'bar-wrapper';
+
+                var bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = Math.max(pct, 2) + '%';
+
+                var tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = 'Rp ' + val.toLocaleString('id-ID');
+                bar.appendChild(tooltip);
+
+                barWrapper.appendChild(bar);
+                chartEl.appendChild(barWrapper);
+            });
+
+            labels.forEach(function(lbl) {
+                var span = document.createElement('span');
+                span.textContent = lbl;
+                labelsEl.appendChild(span);
+            });
+        }
+
+        // ── Render Service Summary ──
+        function renderServiceSummary() {
+            var summary = {};
+            filteredTransactions.forEach(function(tx) {
+                tx.items.forEach(function(item) {
+                    if (!summary[item.service]) {
+                        summary[item.service] = { count: 0, revenue: 0, icon: item.icon };
+                    }
+                    summary[item.service].count++;
+                    summary[item.service].revenue += item.subtotal;
+                });
+            });
+
+            var sorted = Object.keys(summary).sort(function(a, b) {
+                return summary[b].revenue - summary[a].revenue;
+            });
+
+            var maxRevenue = sorted.length > 0 ? summary[sorted[0]].revenue : 1;
+            var container = document.getElementById('serviceSummary');
+
+            if (sorted.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Tidak ada data layanan</p></div>';
+                return;
+            }
+
+            var colorMap = {
+                'Cuci Kering': 'blue',
+                'Cuci Setrika': 'orange',
+                'Setrika Saja': 'purple',
+                'Dry Clean': 'teal',
+                'Cuci Sepatu': 'red',
+                'Cuci Selimut': 'green'
+            };
+
+            container.innerHTML = '';
+            sorted.forEach(function(name) {
+                var data = summary[name];
+                var color = colorMap[name] || 'blue';
+                var pct = (data.revenue / maxRevenue) * 100;
+
+                var item = document.createElement('div');
+                item.className = 'service-summary-item';
+                item.innerHTML =
+                    '<div class="service-summary-icon ' + color + '"><i class="bi ' + data.icon + '"></i></div>' +
+                    '<div class="service-summary-info">' +
+                        '<div class="service-summary-name">' + name + '</div>' +
+                        '<div class="service-summary-count">' + data.count + ' pesanan</div>' +
+                        '<div class="service-summary-bar"><div class="fill" style="width:' + pct + '%;"></div></div>' +
+                    '</div>' +
+                    '<div class="service-summary-revenue">Rp ' + data.revenue.toLocaleString('id-ID') + '</div>';
+                container.appendChild(item);
+            });
+        }
+
+        // ── Render Table ──
+        function renderTable() {
+            var tbody = document.getElementById('transactionTable');
+            var emptyState = document.getElementById('emptyState');
+            var paginationArea = document.getElementById('paginationArea');
+
+            var start = (currentPage - 1) * itemsPerPage;
+            var end = start + itemsPerPage;
+            var pageData = filteredTransactions.slice(start, end);
+
+            if (filteredTransactions.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                paginationArea.style.display = 'none';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            paginationArea.style.display = 'block';
+            tbody.innerHTML = '';
+
+            var statusLabels = {
+                selesai: 'Selesai',
+                proses:  'Dalam Proses',
+                antrian: 'Antrian',
+                batal:   'Dibatalkan'
+            };
+
+            var paymentLabels = {
+                cash:     'Tunai',
+                transfer: 'Transfer',
+                ewallet:  'E-Wallet'
+            };
+
+            pageData.forEach(function(tx) {
+                var serviceName = tx.items.map(function(i) { return i.service; }).join(', ');
+                var totalWeight = tx.items.reduce(function(s, i) { return s + i.weight; }, 0);
+
+                var tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td><strong class="text-primary">' + tx.id + '</strong></td>' +
+                    '<td>' + formatDate(tx.date) + '</td>' +
+                    '<td>' + tx.customer + '</td>' +
+                    '<td>' + serviceName + '</td>' +
+                    '<td>' + totalWeight + ' kg</td>' +
+                    '<td>Rp ' + tx.subtotal.toLocaleString('id-ID') + '</td>' +
+                    '<td>' + (tx.discount > 0 ? '<span style="color:#28a745;">-Rp ' + tx.discount.toLocaleString('id-ID') + '</span>' : '-') + '</td>' +
+                    '<td><strong>Rp ' + tx.total.toLocaleString('id-ID') + '</strong></td>' +
+                    '<td><span class="payment-badge ' + tx.payment + '">' + (paymentLabels[tx.payment] || tx.payment) + '</span></td>' +
+                    '<td><span class="badge-status ' + tx.status + '">' + (statusLabels[tx.status] || tx.status) + '</span></td>';
+                tbody.appendChild(tr);
+            });
+
+            renderPagination();
+        }
+
+        // ── Pagination ──
+        function renderPagination() {
+            var totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+            var info = document.getElementById('paginationInfo');
+            var btns = document.getElementById('paginationBtns');
+
+            var start = (currentPage - 1) * itemsPerPage + 1;
+            var end = Math.min(currentPage * itemsPerPage, filteredTransactions.length);
+            info.textContent = 'Menampilkan ' + start + '-' + end + ' dari ' + filteredTransactions.length + ' transaksi';
+
+            btns.innerHTML = '';
+
+            var prevBtn = document.createElement('button');
+            prevBtn.className = 'pagination-btn';
+            prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i>';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.addEventListener('click', function() {
+                if (currentPage > 1) { currentPage--; renderTable(); }
+            });
+            btns.appendChild(prevBtn);
+
+            var maxVisible = 5;
+            var startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            var endPage = Math.min(totalPages, startPage + maxVisible - 1);
+            if (endPage - startPage < maxVisible - 1) startPage = Math.max(1, endPage - maxVisible + 1);
+
+            if (startPage > 1) {
+                var btn = document.createElement('button');
+                btn.className = 'pagination-btn';
+                btn.textContent = '1';
+                btn.addEventListener('click', function() { currentPage = 1; renderTable(); });
+                btns.appendChild(btn);
+                if (startPage > 2) {
+                    var dots = document.createElement('button');
+                    dots.className = 'pagination-btn';
+                    dots.textContent = '...';
+                    dots.disabled = true;
+                    btns.appendChild(dots);
+                }
+            }
+
+            for (var i = startPage; i <= endPage; i++) {
+                var btn = document.createElement('button');
+                btn.className = 'pagination-btn' + (i === currentPage ? ' active' : '');
+                btn.textContent = i;
+                btn.dataset.page = i;
+                btn.addEventListener('click', function() {
+                    currentPage = parseInt(this.dataset.page);
+                    renderTable();
+                });
+                btns.appendChild(btn);
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    var dots = document.createElement('button');
+                    dots.className = 'pagination-btn';
+                    dots.textContent = '...';
+                    dots.disabled = true;
+                    btns.appendChild(dots);
+                }
+                var btn = document.createElement('button');
+                btn.className = 'pagination-btn';
+                btn.textContent = totalPages;
+                btn.addEventListener('click', function() { currentPage = totalPages; renderTable(); });
+                btns.appendChild(btn);
+            }
+
+            var nextBtn = document.createElement('button');
+            nextBtn.className = 'pagination-btn';
+            nextBtn.innerHTML = '<i class="bi bi-chevron-right"></i>';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.addEventListener('click', function() {
+                if (currentPage < totalPages) { currentPage++; renderTable(); }
+            });
+            btns.appendChild(nextBtn);
+        }
+
+        // ── Export CSV ──
+        document.getElementById('btnExportCSV').addEventListener('click', function() {
+            if (filteredTransactions.length === 0) {
+                showToast('Tidak ada data untuk di-export!', 'error');
+                return;
+            }
+
+            var csv = 'No. Pesanan,Tanggal,Pelanggan,Layanan,Berat,Subtotal,Diskon,Total,Pembayaran,Status\n';
+            filteredTransactions.forEach(function(tx) {
+                var serviceName = tx.items.map(function(i) { return i.service; }).join('; ');
+                var totalWeight = tx.items.reduce(function(s, i) { return s + i.weight; }, 0);
+                csv += '"' + tx.id + '","' + formatDate(tx.date) + '","' + tx.customer + '","' + serviceName + '",' +
+                       totalWeight + ',' + tx.subtotal + ',' + tx.discount + ',' + tx.total + ',"' + tx.payment + '","' + tx.status + '"\n';
+            });
+
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'laporan-penjualan-' + document.getElementById('startDate').value + '-sd-' + document.getElementById('endDate').value + '.csv';
+            link.click();
+            showToast('CSV berhasil di-export!', 'success');
+        });
+
+        // ── Export PDF (print) ──
+        document.getElementById('btnExportPDF').addEventListener('click', function() {
+            window.print();
+        });
+
+        // ── Toast ──
+        function showToast(msg, type) {
+            var toast     = document.getElementById('toast');
+            var toastText = document.getElementById('toastText');
+            var icon      = toast.querySelector('i');
+
+            toast.className   = 'toast-custom ' + (type || 'success');
+            icon.className    = type === 'error' ? 'bi bi-exclamation-circle-fill' : 'bi bi-check-circle-fill';
+            toastText.textContent = msg;
+            toast.classList.add('show');
+
+            setTimeout(function() { toast.classList.remove('show'); }, 3000);
+        }
+
+        // ── Initial Load ──
+        filterData();
+
+    });
+    </script>
+</body>
+</html>

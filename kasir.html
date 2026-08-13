@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasir - LaundryKu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        /* ── Sidebar (same as dashboard) ── */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-brand .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand .brand-icon i { font-size: 20px; color: white; }
+        .sidebar-brand h5 { color: white; font-size: 16px; font-weight: 700; margin: 0; }
+        .sidebar-brand small { color: rgba(255,255,255,0.5); font-size: 11px; }
+
+        .sidebar-menu { padding: 16px 12px; }
+
+        .sidebar-menu .menu-label {
+            color: rgba(255,255,255,0.35);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 12px 12px 8px;
+            font-weight: 600;
+        }
+
+        .sidebar-menu .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 12px;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 2px;
+        }
+
+        .sidebar-menu .nav-link:hover { background: rgba(255,255,255,0.08); color: white; }
+        .sidebar-menu .nav-link.active {
+            background: linear-gradient(135deg, rgba(0,210,255,0.2), rgba(58,123,213,0.2));
+            color: #00d2ff;
+        }
+
+        .sidebar-menu .nav-link i { font-size: 18px; width: 22px; text-align: center; }
+
+        .sidebar-menu .nav-link .badge {
+            margin-left: auto;
+            font-size: 10px;
+            padding: 3px 8px;
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-footer .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-footer .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer .user-name { color: white; font-size: 13px; font-weight: 600; }
+        .sidebar-footer .user-role { color: rgba(255,255,255,0.5); font-size: 11px; }
+
+        /* ── Main ── */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .topbar {
+            background: white;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+
+        .btn-toggle-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #495057;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .page-title h4 { font-size: 18px; font-weight: 700; color: #1a1a2e; margin: 0; }
+        .page-title small { color: #868e96; font-size: 12px; }
+
+        .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+        .topbar-right .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #495057;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .topbar-right .btn-icon:hover { background: #f8f9fa; }
+
+        .content-wrapper { padding: 28px; }
+
+        /* ── Sidebar overlay ── */
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+
+        /* ── Kasir specific ── */
+        .kasir-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .card-custom {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e9ecef;
+            overflow: hidden;
+        }
+
+        .card-custom .card-header-custom {
+            padding: 18px 22px;
+            border-bottom: 1px solid #f1f3f5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-custom .card-header-custom h6 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin: 0;
+        }
+
+        .card-custom .card-body-custom { padding: 22px; }
+
+        /* ── Service Cards ── */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .service-card {
+            border: 2px solid #e9ecef;
+            border-radius: 14px;
+            padding: 18px 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .service-card:hover {
+            border-color: #00d2ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,210,255,0.15);
+        }
+
+        .service-card.selected {
+            border-color: #00d2ff;
+            background: linear-gradient(135deg, rgba(0,210,255,0.05), rgba(58,123,213,0.05));
+        }
+
+        .service-card .service-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 24px;
+        }
+
+        .service-card .service-icon.blue   { background: rgba(0,210,255,0.1);  color: #00d2ff; }
+        .service-card .service-icon.green  { background: rgba(40,167,69,0.1);  color: #28a745; }
+        .service-card .service-icon.orange { background: rgba(255,165,0,0.1);  color: #ffa500; }
+        .service-card .service-icon.purple { background: rgba(128,0,255,0.1);  color: #8000ff; }
+        .service-card .service-icon.red    { background: rgba(220,53,69,0.1);  color: #dc3545; }
+        .service-card .service-icon.teal   { background: rgba(0,128,128,0.1);  color: #008080; }
+
+        .service-card .service-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 2px;
+        }
+
+        .service-card .service-price {
+            font-size: 11px;
+            color: #868e96;
+        }
+
+        /* ── Form inputs ── */
+        .form-label-custom {
+            font-size: 13px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 6px;
+        }
+
+        .form-control-custom {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 14px;
+            color: #1a1a2e;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .form-control-custom:focus {
+            border-color: #00d2ff;
+            box-shadow: 0 0 0 3px rgba(0,210,255,0.1);
+            outline: none;
+        }
+
+        .form-control-custom::placeholder { color: #adb5bd; }
+
+        select.form-control-custom {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23868e96' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+
+        /* ── Order items list ── */
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .order-item:last-child { border-bottom: none; }
+
+        .order-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            background: rgba(0,210,255,0.1);
+            color: #00d2ff;
+        }
+
+        .order-item-info { flex: 1; }
+
+        .order-item-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .order-item-detail {
+            font-size: 11px;
+            color: #868e96;
+        }
+
+        .order-item-price {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a2e;
+            white-space: nowrap;
+        }
+
+        .order-item-remove {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .order-item-remove:hover { background: rgba(220,53,69,0.1); }
+
+        /* ── Summary ── */
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+            color: #495057;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid #e9ecef;
+            margin-top: 8px;
+            padding-top: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .summary-row .discount { color: #28a745; }
+
+        /* ── Payment section ── */
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .payment-method {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .payment-method:hover { border-color: #00d2ff; }
+
+        .payment-method.selected {
+            border-color: #00d2ff;
+            background: rgba(0,210,255,0.05);
+        }
+
+        .payment-method i {
+            font-size: 22px;
+            display: block;
+            margin-bottom: 4px;
+            color: #495057;
+        }
+
+        .payment-method.selected i { color: #00d2ff; }
+
+        .payment-method span {
+            font-size: 11px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .payment-method.selected span { color: #00d2ff; }
+
+        /* ── Buttons ── */
+        .btn-primary-custom {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,210,255,0.35);
+        }
+
+        .btn-primary-custom:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success-custom {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40,167,69,0.35);
+        }
+
+        .btn-success-custom:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-outline-custom {
+            height: 42px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background: white;
+            color: #495057;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-outline-custom:hover {
+            border-color: #dc3545;
+            color: #dc3545;
+            background: rgba(220,53,69,0.05);
+        }
+
+        /* ── Empty state ── */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #adb5bd;
+        }
+
+        .empty-state i { font-size: 48px; margin-bottom: 12px; display: block; }
+        .empty-state p { font-size: 14px; }
+
+        /* ── Toast notification ── */
+        .toast-custom {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1a1a2e;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast-custom.show { transform: translateY(0); opacity: 1; }
+        .toast-custom i { font-size: 20px; }
+        .toast-custom.success i { color: #28a745; }
+        .toast-custom.error   i { color: #dc3545; }
+
+        /* ── Bluetooth Printer ── */
+        .printer-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .printer-status.disconnected {
+            background: rgba(220,53,69,0.1);
+            color: #dc3545;
+            border: 1px solid rgba(220,53,69,0.2);
+        }
+
+        .printer-status.connected {
+            background: rgba(40,167,69,0.1);
+            color: #28a745;
+            border: 1px solid rgba(40,167,69,0.2);
+        }
+
+        .printer-status.connecting {
+            background: rgba(255,165,0,0.1);
+            color: #ffa500;
+            border: 1px solid rgba(255,165,0,0.2);
+        }
+
+        .printer-status:hover { opacity: 0.8; }
+
+        .printer-status .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .printer-status.disconnected .status-dot { background: #dc3545; }
+        .printer-status.connected .status-dot    { background: #28a745; }
+        .printer-status.connecting .status-dot   { background: #ffa500; animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .printer-modal-body {
+            padding: 24px;
+        }
+
+        .printer-device-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .printer-device-card:hover {
+            border-color: #00d2ff;
+            background: rgba(0,210,255,0.03);
+        }
+
+        .printer-device-card .device-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(0,210,255,0.1), rgba(58,123,213,0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .printer-device-card .device-icon i {
+            font-size: 22px;
+            color: #3a7bd5;
+        }
+
+        .printer-device-card .device-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .printer-device-card .device-id {
+            font-size: 11px;
+            color: #868e96;
+            font-family: monospace;
+        }
+
+        .printer-test-btn {
+            margin-top: 12px;
+            height: 44px;
+            border: 2px solid #00d2ff;
+            border-radius: 10px;
+            background: rgba(0,210,255,0.05);
+            color: #00d2ff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .printer-test-btn:hover {
+            background: rgba(0,210,255,0.15);
+        }
+
+        .printer-disconnect-btn {
+            margin-top: 8px;
+            height: 44px;
+            border: 2px solid #dc3545;
+            border-radius: 10px;
+            background: rgba(220,53,69,0.05);
+            color: #dc3545;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .printer-disconnect-btn:hover {
+            background: rgba(220,53,69,0.15);
+        }
+
+        .printer-info-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 16px;
+            border-left: 3px solid #00d2ff;
+        }
+
+        .printer-info-box p {
+            font-size: 12px;
+            color: #495057;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .printer-printing-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .printer-printing-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .printer-printing-card .spinner-border {
+            width: 48px;
+            height: 48px;
+            color: #00d2ff;
+        }
+
+        .printer-printing-card p {
+            margin-top: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 1199.98px) {
+            .kasir-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .order-panel {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.show { transform: translateX(0); }
+            .sidebar-overlay.show { display: block; }
+            .main-content { margin-left: 0; }
+            .btn-toggle-sidebar { display: block; }
+        }
+
+        @media (max-width: 575.98px) {
+            .content-wrapper { padding: 16px; }
+            .topbar { padding: 12px 16px; }
+            .page-title h4 { font-size: 15px; }
+            .card-custom .card-body-custom { padding: 16px; }
+            .service-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .service-card { padding: 14px 10px; }
+            .payment-methods { grid-template-columns: repeat(3, 1fr); }
+            .payment-method { padding: 10px 6px; }
+            .payment-method i { font-size: 18px; }
+            .payment-method span { font-size: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon"><i class="bi bi-droplet-fill"></i></div>
+            <div>
+                <h5>LaundryKu</h5>
+                <small>Management System</small>
+            </div>
+        </div>
+        <nav class="sidebar-menu">
+            <div class="menu-label">Menu Utama</div>
+            <a href="dashboard.html" class="nav-link"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+            <a href="kasir.html" class="nav-link active"><i class="bi bi-cash-register"></i> Kasir</a>
+            <a href="pesanan.html" class="nav-link"><i class="bi bi-receipt"></i> Pesanan <span class="badge bg-warning text-dark">12</span></a>
+            <a href="layanan.html" class="nav-link"><i class="bi bi-box-seam"></i> Layanan</a>
+            <div class="menu-label">Pelanggan</div>
+            <a href="#" class="nav-link"><i class="bi bi-people"></i> Daftar Pelanggan</a>
+            <div class="menu-label">Laporan</div>
+            <a href="laporan.html" class="nav-link"><i class="bi bi-graph-up"></i> Laporan Penjualan</a>
+            <div class="menu-label">Pengaturan</div>
+            <a href="#" class="nav-link" id="btnLogout"><i class="bi bi-box-arrow-left"></i> Keluar</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div>
+                    <div class="user-name" id="userName">Administrator</div>
+                    <div class="user-role">Admin</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="btn-toggle-sidebar" id="toggleSidebar"><i class="bi bi-list"></i></button>
+                <div class="page-title">
+                    <h4>Kasir</h4>
+                    <small id="currentDate">Loading...</small>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="printer-status disconnected" id="printerStatus" title="Klik untuk sambungkan printer Bluetooth" onclick="openPrinterModal()">
+                    <span class="status-dot"></span>
+                    <i class="bi bi-printer"></i>
+                    <span id="printerStatusText">Printer Off</span>
+                </div>
+                <button class="btn-icon" title="Riwayat Transaksi" onclick="alert('Fitur riwayat transaksi')">
+                    <i class="bi bi-clock-history"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <div class="kasir-grid">
+
+                <!-- LEFT: Service Selection + Customer Info -->
+                <div>
+                    <!-- Customer Info -->
+                    <div class="card-custom mb-4">
+                        <div class="card-header-custom">
+                            <h6><i class="bi bi-person-circle me-2"></i>Informasi Pelanggan</h6>
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label-custom">Nama Pelanggan</label>
+                                    <input type="text" class="form-control-custom" id="customerName" placeholder="Masukkan nama pelanggan">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-custom">No. Telepon</label>
+                                    <input type="tel" class="form-control-custom" id="customerPhone" placeholder="08xxxxxxxxxx">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label-custom">Alamat (Opsional)</label>
+                                    <input type="text" class="form-control-custom" id="customerAddress" placeholder="Alamat pelanggan">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Service Selection -->
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <h6><i class="bi bi-box-seam me-2"></i>Pilih Layanan</h6>
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="service-grid" id="serviceGrid">
+                                <!-- Rendered by JS -->
+                            </div>
+
+                            <!-- Weight / qty -->
+                            <div class="row g-3 mt-1">
+                                <div class="col-sm-6">
+                                    <label class="form-label-custom">Berat (kg)</label>
+                                    <input type="number" class="form-control-custom" id="inputWeight" placeholder="0" min="0.5" step="0.5" value="1">
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label-custom">Catatan (Opsional)</label>
+                                    <input type="text" class="form-control-custom" id="inputNote" placeholder="Contoh: ada noda minyak">
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary-custom mt-3" id="btnAddItem">
+                                <i class="bi bi-plus-circle me-2"></i>Tambah ke Pesanan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Order Summary + Payment -->
+                <div class="order-panel">
+                    <div class="card-custom mb-4">
+                        <div class="card-header-custom">
+                            <h6><i class="bi bi-receipt me-2"></i>Ringkasan Pesanan</h6>
+                            <span class="badge bg-primary rounded-pill" id="itemCount">0 item</span>
+                        </div>
+                        <div class="card-body-custom">
+                            <div id="orderList">
+                                <div class="empty-state">
+                                    <i class="bi bi-bag-x"></i>
+                                    <p>Belum ada item dipilih</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total + Discount -->
+                    <div class="card-custom mb-4">
+                        <div class="card-body-custom">
+                            <div class="summary-row">
+                                <span>Subtotal</span>
+                                <span id="subtotal">Rp 0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Diskon</span>
+                                <span class="discount" id="discount">- Rp 0</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total</span>
+                                <span id="totalPrice">Rp 0</span>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="form-label-custom">Kode Diskon (Opsional)</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control-custom" id="discountCode" placeholder="Masukkan kode">
+                                    <button class="btn btn-sm btn-outline-secondary" id="btnApplyDiscount" style="border-radius:0 10px 10px 0; white-space:nowrap;">Terapkan</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="card-custom mb-4">
+                        <div class="card-header-custom">
+                            <h6><i class="bi bi-credit-card me-2"></i>Metode Pembayaran</h6>
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="payment-methods" id="paymentMethods">
+                                <div class="payment-method selected" data-method="cash">
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Tunai</span>
+                                </div>
+                                <div class="payment-method" data-method="transfer">
+                                    <i class="bi bi-bank"></i>
+                                    <span>Transfer</span>
+                                </div>
+                                <div class="payment-method" data-method="ewallet">
+                                    <i class="bi bi-phone"></i>
+                                    <span>E-Wallet</span>
+                                </div>
+                            </div>
+
+                            <div id="cashInputSection">
+                                <label class="form-label-custom">Uang Diterima</label>
+                                <input type="number" class="form-control-custom mb-2" id="cashReceived" placeholder="Masukkan jumlah uang" min="0">
+                                <div class="summary-row" id="changeRow" style="display:none;">
+                                    <span>Kembalian</span>
+                                    <span id="changeAmount" style="font-weight:700; color:#28a745;">Rp 0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-success-custom" id="btnPay" disabled>
+                            <i class="bi bi-check-circle me-2"></i>Proses Pembayaran
+                        </button>
+                        <button class="btn btn-outline-custom" id="btnClear">
+                            <i class="bi bi-trash3 me-2"></i>Batal Semua
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast -->
+    <div class="toast-custom" id="toast">
+        <i class="bi bi-check-circle-fill"></i>
+        <span id="toastText"></span>
+    </div>
+
+    <!-- Bluetooth Printer Modal -->
+    <div class="modal fade" id="printerModal" tabindex="-1" aria-labelledby="printerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius:16px; border:none; overflow:hidden;">
+                <div class="modal-header" style="border-bottom:1px solid #f1f3f5; padding:18px 24px;">
+                    <h6 class="modal-title" id="printerModalLabel" style="font-weight:700; font-size:16px;">
+                        <i class="bi bi-bluetooth me-2" style="color:#3a7bd5;"></i>Printer Bluetooth
+                    </h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="printer-modal-body" id="printerModalBody">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Printing Overlay -->
+    <div class="printer-printing-overlay" id="printingOverlay" style="display:none;">
+        <div class="printer-printing-card">
+            <div class="spinner-border" role="status"></div>
+            <p>Sedang mencetak struk...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // ── Session ──
+        if (sessionStorage.getItem('loggedIn') !== 'true') {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        const userData = JSON.parse(sessionStorage.getItem('user'));
+        if (userData) {
+            document.getElementById('userName').textContent = userData.name;
+            document.getElementById('userAvatar').textContent = userData.name.charAt(0).toUpperCase();
+        }
+
+        // ── Date ──
+        const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', opts);
+
+        // ── Sidebar ──
+        const sidebar  = document.getElementById('sidebar');
+        const overlay  = document.getElementById('sidebarOverlay');
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+        });
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+        });
+
+        // ── Logout ──
+        document.getElementById('btnLogout').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Yakin ingin keluar?')) {
+                sessionStorage.clear();
+                window.location.href = 'index.html';
+            }
+        });
+
+        // ── Services ──
+        const services = [
+            { id: 1, name: 'Cuci Kering',   icon: 'bi-droplet',  color: 'blue',   pricePerKg: 10000 },
+            { id: 2, name: 'Cuci Setrika',   icon: 'bi-fire',     color: 'orange', pricePerKg: 12000 },
+            { id: 3, name: 'Setrika Saja',   icon: 'bi-lightning', color: 'purple', pricePerKg: 7000  },
+            { id: 4, name: 'Dry Clean',      icon: 'bi-wind',     color: 'teal',   pricePerKg: 20000 },
+            { id: 5, name: 'Cuci Sepatu',    icon: 'bi-foot',     color: 'red',    pricePerKg: 25000 },
+            { id: 6, name: 'Cuci Selimut',   icon: 'bi-cloud',    color: 'green',  pricePerKg: 15000 },
+        ];
+
+        const serviceGrid = document.getElementById('serviceGrid');
+        let selectedService = null;
+
+        services.forEach(function(svc) {
+            const card = document.createElement('div');
+            card.className = 'service-card';
+            card.dataset.id = svc.id;
+            card.innerHTML =
+                '<div class="service-icon ' + svc.color + '"><i class="bi ' + svc.icon + '"></i></div>' +
+                '<div class="service-name">' + svc.name + '</div>' +
+                '<div class="service-price">Rp ' + svc.pricePerKg.toLocaleString('id-ID') + '/kg</div>';
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.service-card').forEach(function(c) { c.classList.remove('selected'); });
+                card.classList.add('selected');
+                selectedService = svc;
+            });
+            serviceGrid.appendChild(card);
+        });
+
+        // ── Order State ──
+        let orders = [];
+        let discountAmount = 0;
+        let discountCodeApplied = '';
+
+        const DISCOUNT_CODES = {
+            'LAUNDRY10': { type: 'percent', value: 10 },
+            'HEMAT5000': { type: 'fixed',   value: 5000 },
+            'NEWUSER':   { type: 'percent', value: 15 },
+        };
+
+        // ── Render Orders ──
+        function renderOrders() {
+            const list = document.getElementById('orderList');
+            const countBadge = document.getElementById('itemCount');
+
+            if (orders.length === 0) {
+                list.innerHTML = '<div class="empty-state"><i class="bi bi-bag-x"></i><p>Belum ada item dipilih</p></div>';
+                countBadge.textContent = '0 item';
+                updateSummary();
+                return;
+            }
+
+            countBadge.textContent = orders.length + ' item';
+            list.innerHTML = '';
+
+            orders.forEach(function(order, idx) {
+                const item = document.createElement('div');
+                item.className = 'order-item';
+                item.innerHTML =
+                    '<div class="order-item-icon"><i class="bi ' + order.icon + '"></i></div>' +
+                    '<div class="order-item-info">' +
+                        '<div class="order-item-name">' + order.service + '</div>' +
+                        '<div class="order-item-detail">' + order.weight + ' kg &times; Rp ' + order.pricePerKg.toLocaleString('id-ID') + (order.note ? ' &middot; ' + order.note : '') + '</div>' +
+                    '</div>' +
+                    '<div class="order-item-price">Rp ' + order.subtotal.toLocaleString('id-ID') + '</div>' +
+                    '<button class="order-item-remove" data-idx="' + idx + '"><i class="bi bi-x-lg"></i></button>';
+                list.appendChild(item);
+            });
+
+            list.querySelectorAll('.order-item-remove').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    orders.splice(parseInt(this.dataset.idx), 1);
+                    renderOrders();
+                });
+            });
+
+            updateSummary();
+        }
+
+        // ── Summary ──
+        function updateSummary() {
+            const subtotal = orders.reduce(function(sum, o) { return sum + o.subtotal; }, 0);
+            const disc     = discountAmount;
+            const total    = Math.max(0, subtotal - disc);
+
+            document.getElementById('subtotal').textContent    = 'Rp ' + subtotal.toLocaleString('id-ID');
+            document.getElementById('discount').textContent    = '- Rp ' + disc.toLocaleString('id-ID');
+            document.getElementById('totalPrice').textContent  = 'Rp ' + total.toLocaleString('id-ID');
+
+            const payBtn = document.getElementById('btnPay');
+            payBtn.disabled = orders.length === 0;
+
+            // Update cash change
+            updateCashChange();
+        }
+
+        // ── Add Item ──
+        document.getElementById('btnAddItem').addEventListener('click', function() {
+            if (!selectedService) { showToast('Pilih layanan terlebih dahulu!', 'error'); return; }
+
+            const weight = parseFloat(document.getElementById('inputWeight').value);
+            if (!weight || weight <= 0) { showToast('Masukkan berat yang valid!', 'error'); return; }
+
+            const note    = document.getElementById('inputNote').value.trim();
+            const subtotal = Math.round(weight * selectedService.pricePerKg);
+
+            orders.push({
+                service:    selectedService.name,
+                icon:       selectedService.icon,
+                weight:     weight,
+                pricePerKg: selectedService.pricePerKg,
+                subtotal:   subtotal,
+                note:       note
+            });
+
+            renderOrders();
+            showToast(selectedService.name + ' ditambahkan!', 'success');
+
+            // Reset
+            document.getElementById('inputWeight').value = 1;
+            document.getElementById('inputNote').value   = '';
+        });
+
+        // ── Discount ──
+        document.getElementById('btnApplyDiscount').addEventListener('click', function() {
+            const code = document.getElementById('discountCode').value.trim().toUpperCase();
+            if (!code) { showToast('Masukkan kode diskon!', 'error'); return; }
+
+            if (DISCOUNT_CODES[code]) {
+                const disc = DISCOUNT_CODES[code];
+                const subtotal = orders.reduce(function(s, o) { return s + o.subtotal; }, 0);
+
+                if (disc.type === 'percent') {
+                    discountAmount = Math.round(subtotal * disc.value / 100);
+                } else {
+                    discountAmount = disc.value;
+                }
+
+                discountCodeApplied = code;
+                updateSummary();
+                showToast('Diskon ' + code + ' berhasil diterapkan!', 'success');
+            } else {
+                showToast('Kode diskon tidak valid!', 'error');
+            }
+        });
+
+        // ── Payment Methods ──
+        let selectedPayment = 'cash';
+
+        document.querySelectorAll('.payment-method').forEach(function(el) {
+            el.addEventListener('click', function() {
+                document.querySelectorAll('.payment-method').forEach(function(m) { m.classList.remove('selected'); });
+                el.classList.add('selected');
+                selectedPayment = el.dataset.method;
+
+                document.getElementById('cashInputSection').style.display =
+                    selectedPayment === 'cash' ? 'block' : 'none';
+            });
+        });
+
+        // ── Cash input ──
+        document.getElementById('cashReceived').addEventListener('input', updateCashChange);
+
+        function updateCashChange() {
+            const subtotal = orders.reduce(function(s, o) { return s + o.subtotal; }, 0);
+            const total    = Math.max(0, subtotal - discountAmount);
+            const received = parseFloat(document.getElementById('cashReceived').value) || 0;
+            const change   = received - total;
+
+            const changeRow = document.getElementById('changeRow');
+            if (received > 0) {
+                changeRow.style.display = 'flex';
+                document.getElementById('changeAmount').textContent = 'Rp ' + Math.max(0, change).toLocaleString('id-ID');
+                document.getElementById('changeAmount').style.color = change < 0 ? '#dc3545' : '#28a745';
+            } else {
+                changeRow.style.display = 'none';
+            }
+        }
+
+        // ── Pay ──
+        document.getElementById('btnPay').addEventListener('click', function() {
+            if (orders.length === 0) { return; }
+
+            const customerName = document.getElementById('customerName').value.trim();
+            if (!customerName) { showToast('Masukkan nama pelanggan!', 'error'); document.getElementById('customerName').focus(); return; }
+
+            const subtotal = orders.reduce(function(s, o) { return s + o.subtotal; }, 0);
+            const total    = Math.max(0, subtotal - discountAmount);
+
+            if (selectedPayment === 'cash') {
+                const received = parseFloat(document.getElementById('cashReceived').value) || 0;
+                if (received < total) {
+                    showToast('Uang diterima kurang dari total!', 'error');
+                    return;
+                }
+            }
+
+            // Generate order ID
+            const orderId = 'LG-' + String(Math.floor(Math.random() * 9000) + 1000);
+
+            const change = selectedPayment === 'cash'
+                ? (parseFloat(document.getElementById('cashReceived').value) || 0) - total
+                : 0;
+
+            const cashReceived = selectedPayment === 'cash'
+                ? (parseFloat(document.getElementById('cashReceived').value) || 0)
+                : 0;
+
+            // Print receipt via Bluetooth or show alert
+            printReceipt(
+                orderId,
+                customerName,
+                document.getElementById('customerPhone').value,
+                orders,
+                subtotal,
+                discountAmount,
+                total,
+                selectedPayment,
+                cashReceived,
+                change
+            );
+
+            // Save to session
+            const history = JSON.parse(sessionStorage.getItem('orderHistory') || '[]');
+            history.push({
+                id: orderId,
+                customer: customerName,
+                phone: document.getElementById('customerPhone').value,
+                items: orders,
+                subtotal: subtotal,
+                discount: discountAmount,
+                total: total,
+                payment: selectedPayment,
+                date: new Date().toISOString()
+            });
+            sessionStorage.setItem('orderHistory', JSON.stringify(history));
+
+            // Reset
+            orders = [];
+            discountAmount = 0;
+            discountCodeApplied = '';
+            document.getElementById('discountCode').value = '';
+            document.getElementById('cashReceived').value = '';
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('customerAddress').value = '';
+            document.querySelectorAll('.service-card').forEach(function(c) { c.classList.remove('selected'); });
+            selectedService = null;
+
+            renderOrders();
+            showToast('Pembayaran berhasil! Pesanan ' + orderId + ' tersimpan.', 'success');
+        });
+
+        // ── Clear All ──
+        document.getElementById('btnClear').addEventListener('click', function() {
+            if (orders.length === 0) return;
+            if (!confirm('Yakin ingin membatalkan semua pesanan?')) return;
+
+            orders = [];
+            discountAmount = 0;
+            document.getElementById('discountCode').value = '';
+            document.getElementById('cashReceived').value = '';
+            document.querySelectorAll('.service-card').forEach(function(c) { c.classList.remove('selected'); });
+            selectedService = null;
+            renderOrders();
+            showToast('Semua pesanan dibatalkan.', 'error');
+        });
+
+        // ── Toast ──
+        function showToast(msg, type) {
+            const toast     = document.getElementById('toast');
+            const toastText = document.getElementById('toastText');
+            const icon      = toast.querySelector('i');
+
+            toast.className   = 'toast-custom ' + type;
+            icon.className    = type === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill';
+            toastText.textContent = msg;
+            toast.classList.add('show');
+
+            setTimeout(function() { toast.classList.remove('show'); }, 3000);
+        }
+
+        // ── Bluetooth Thermal Printer ──
+        var btDevice = null;
+        var btCharacteristic = null;
+        var printerModal = null;
+
+        function initPrinterModal() {
+            printerModal = new bootstrap.Modal(document.getElementById('printerModal'));
+            loadSavedPrinterInfo();
+        }
+
+        function loadSavedPrinterInfo() {
+            var saved = JSON.parse(localStorage.getItem('laundryku_printer') || 'null');
+            if (saved) {
+                updatePrinterUI('disconnected', saved.name || 'Printer tersimpan');
+                document.getElementById('printerStatusText').textContent = saved.name || 'Printer Off';
+            }
+        }
+
+        function openPrinterModal() {
+            renderPrinterModalContent();
+            printerModal.show();
+        }
+
+        function renderPrinterModalContent() {
+            var body = document.getElementById('printerModalBody');
+            var saved = JSON.parse(localStorage.getItem('laundryku_printer') || 'null');
+            var isConnected = btDevice && btDevice.gatt.connected;
+
+            if (isConnected) {
+                body.innerHTML =
+                    '<div class="printer-device-card" style="border-color:#28a745;">' +
+                        '<div class="device-icon"><i class="bi bi-printer" style="color:#28a745;"></i></div>' +
+                        '<div>' +
+                            '<div class="device-name" style="color:#28a745;">' + (btDevice.name || 'Printer') + '</div>' +
+                            '<div class="device-id">Terhubung &bull; Siap mencetak</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<button class="printer-test-btn" onclick="testPrint()" style="margin-top:16px;">' +
+                        '<i class="bi bi-printer me-1"></i>Cetak Test' +
+                    '</button>' +
+                    '<button class="printer-disconnect-btn" onclick="disconnectPrinter()">' +
+                        '<i class="bi bi-x-circle me-1"></i>Putuskan Koneksi' +
+                    '</button>';
+            } else {
+                body.innerHTML =
+                    '<div style="text-align:center; padding:10px 0;">' +
+                        '<i class="bi bi-bluetooth" style="font-size:48px; color:#adb5bd;"></i>' +
+                        '<p style="margin-top:12px; font-size:14px; color:#868e96;">Tekan tombol di bawah untuk mencari printer</p>' +
+                    '</div>' +
+                    '<button class="btn btn-primary-custom" id="btnScanPrinter" onclick="scanAndConnectPrinter()" style="margin-top:8px;">' +
+                        '<i class="bi bi-search me-2"></i>Cari Printer Bluetooth' +
+                    '</button>' +
+                    '<div class="printer-info-box">' +
+                        '<p><i class="bi bi-info-circle me-1"></i> Pastikan printer thermal sudah menyala dan dalam mode pairing. ' +
+                        'Gunakan printer dengan protocol ESC/POS.</p>' +
+                    '</div>';
+            }
+        }
+
+        function scanAndConnectPrinter() {
+            if (!navigator.bluetooth) {
+                showToast('Browser tidak mendukung Web Bluetooth! Gunakan Chrome.', 'error');
+                return;
+            }
+
+            var btnScan = document.getElementById('btnScanPrinter');
+            if (btnScan) {
+                btnScan.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mencari printer...';
+                btnScan.disabled = true;
+            }
+
+            navigator.bluetooth.requestDevice({
+                filters: [
+                    { services: ['000018f0-0000-1000-8000-00805f9b34fb'] },
+                    { namePrefix: 'Printer' },
+                    { namePrefix: 'printer' },
+                    { namePrefix: 'BT-' },
+                    { namePrefix: 'MTP-' },
+                    { namePrefix: 'POS' },
+                    { namePrefix: 'Blue' },
+                    { namePrefix: 'TG' }
+                ],
+                optionalServices: [
+                    '000018f0-0000-1000-8000-00805f9b34fb',
+                    '0000ffe0-0000-1000-8000-00805f9b34fb',
+                    '00001101-0000-1000-8000-00805f9b34fb'
+                ]
+            }).then(function(device) {
+                btDevice = device;
+                device.addEventListener('gattserverdisconnected', onPrinterDisconnected);
+                showToast('Menyambungkan ke ' + (device.name || 'printer') + '...', 'success');
+                return device.gatt.connect();
+            }).then(function(gattServer) {
+                return gattServer.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb')
+                    .catch(function() {
+                        return gattServer.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb');
+                    })
+                    .catch(function() {
+                        return gattServer.getPrimaryService('00001101-0000-1000-8000-00805f9b34fb');
+                    });
+            }).then(function(service) {
+                return service.getCharacteristics();
+            }).then(function(characteristics) {
+                btCharacteristic = null;
+                for (var i = 0; i < characteristics.length; i++) {
+                    var props = characteristics[i].properties;
+                    if (props.write || props.writeWithoutResponse) {
+                        btCharacteristic = characteristics[i];
+                        break;
+                    }
+                }
+                if (!btCharacteristic && characteristics.length > 0) {
+                    btCharacteristic = characteristics[characteristics.length - 1];
+                }
+                if (!btCharacteristic) {
+                    throw new Error('Tidak ditemukan characteristic untuk menulis');
+                }
+
+                var printerName = btDevice.name || 'Printer';
+                localStorage.setItem('laundryku_printer', JSON.stringify({
+                    name: printerName,
+                    id: btDevice.id
+                }));
+
+                updatePrinterUI('connected', printerName);
+                showToast('Printer ' + printerName + ' terhubung!', 'success');
+                renderPrinterModalContent();
+            }).catch(function(err) {
+                console.error('Bluetooth error:', err);
+                showToast('Gagal menyambungkan: ' + err.message, 'error');
+                updatePrinterUI('disconnected', 'Printer Off');
+                renderPrinterModalContent();
+            });
+        }
+
+        function onPrinterDisconnected() {
+            btDevice = null;
+            btCharacteristic = null;
+            updatePrinterUI('disconnected', 'Printer Off');
+            showToast('Printer terputus!', 'error');
+        }
+
+        function disconnectPrinter() {
+            if (btDevice && btDevice.gatt.connected) {
+                btDevice.gatt.disconnect();
+            }
+            btDevice = null;
+            btCharacteristic = null;
+            localStorage.removeItem('laundryku_printer');
+            updatePrinterUI('disconnected', 'Printer Off');
+            renderPrinterModalContent();
+            showToast('Printer diputuskan.', 'error');
+        }
+
+        function updatePrinterUI(status, text) {
+            var el = document.getElementById('printerStatus');
+            var txt = document.getElementById('printerStatusText');
+            el.className = 'printer-status ' + status;
+            txt.textContent = text;
+        }
+
+        // ── ESC/POS Commands ──
+        function escposText(str) {
+            var encoder = new TextEncoder();
+            return encoder.encode(str);
+        }
+
+        function buildReceipt(orderId, customerName, phone, items, subtotal, discount, total, paymentMethod, cashReceived, change) {
+            var lines = [];
+            var N = '\n';
+            var DASHES = '================================';
+            var DOUBLE_DASHES = '================================';
+
+            // Center + Bold + Large
+            lines.push('\x1B\x61\x01'); // center align
+            lines.push('\x1B\x45\x01'); // bold on
+            lines.push('LAUNDRYKU' + N);
+            lines.push('\x1B\x45\x00'); // bold off
+            lines.push('Jl. Contoh No. 123, Kota' + N);
+            lines.push('Telp: 0812-3456-7890' + N);
+            lines.push('\x1B\x61\x00'); // left align
+            lines.push(DASHES + N);
+            lines.push('No.  : ' + orderId + N);
+            lines.push('Tgl  : ' + new Date().toLocaleDateString('id-ID', {day:'2-digit',month:'2-digit',year:'numeric'}) + N);
+            lines.push('Jam  : ' + new Date().toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}) + N);
+            lines.push('Kasir: ' + (userData ? userData.name : '-') + N);
+            lines.push(DASHES + N);
+
+            // Customer
+            lines.push('\x1B\x45\x01'); // bold on
+            lines.push('PELANGGAN' + N);
+            lines.push('\x1B\x45\x00'); // bold off
+            lines.push('Nama : ' + customerName + N);
+            lines.push('Telp : ' + (phone || '-') + N);
+            lines.push(DASHES + N);
+
+            // Items
+            lines.push('\x1B\x45\x01');
+            lines.push('DETAIL LAYANAN' + N);
+            lines.push('\x1B\x45\x00');
+            items.forEach(function(item) {
+                var nameLine = item.service + ' (' + item.weight + 'kg)';
+                var priceLine = 'Rp ' + item.subtotal.toLocaleString('id-ID');
+                // Simple padding - right align price roughly
+                var padding = 32 - nameLine.length - priceLine.length;
+                if (padding < 1) padding = 1;
+                lines.push(nameLine + repeatChar(' ', padding) + priceLine + N);
+                if (item.note) {
+                    lines.push('  Catatan: ' + item.note + N);
+                }
+            });
+            lines.push(DASHES + N);
+
+            // Totals
+            lines.push('Subtotal  : Rp ' + subtotal.toLocaleString('id-ID') + N);
+            if (discount > 0) {
+                lines.push('Diskon    : - Rp ' + discount.toLocaleString('id-ID') + N);
+            }
+            lines.push('\x1B\x45\x01');
+            lines.push('TOTAL     : Rp ' + total.toLocaleString('id-ID') + N);
+            lines.push('\x1B\x45\x00');
+            lines.push(DASHES + N);
+
+            // Payment
+            lines.push('Bayar  : ' + paymentMethod.toUpperCase() + N);
+            if (paymentMethod === 'cash') {
+                lines.push('Tunai  : Rp ' + cashReceived.toLocaleString('id-ID') + N);
+                lines.push('Kembali: Rp ' + change.toLocaleString('id-ID') + N);
+                lines.push(DASHES + N);
+            }
+
+            // Footer
+            lines.push('\x1B\x61\x01'); // center
+            lines.push('Terima kasih atas kunjungan Anda' + N);
+            lines.push('Barang tidak dapat diklaim' + N);
+            lines.push('lebih dari 7 hari' + N);
+            lines.push(N);
+            lines.push(N);
+            lines.push('\x1B\x64\x03'); // feed 3 lines then cut
+            lines.push('\x1D\x56\x00'); // full cut
+
+            return escposText(lines.join(''));
+        }
+
+        function repeatChar(ch, n) {
+            var s = '';
+            for (var i = 0; i < n; i++) s += ch;
+            return s;
+        }
+
+        async function sendToPrinter(data) {
+            if (!btCharacteristic) {
+                throw new Error('Printer tidak terhubung');
+            }
+
+            var chunkSize = 200;
+            for (var i = 0; i < data.length; i += chunkSize) {
+                var chunk = data.slice(i, i + chunkSize);
+                await btCharacteristic.writeValueWithoutResponse(chunk);
+                // Small delay between chunks
+                await new Promise(function(r) { setTimeout(r, 20); });
+            }
+        }
+
+        async function printReceipt(orderId, customerName, phone, items, subtotal, discount, total, paymentMethod, cashReceived, change) {
+            if (!btDevice || !btDevice.gatt.connected) {
+                showToast('Printer tidak terhubung! Menggunakan alert...', 'error');
+                showReceiptAlert(orderId, customerName, phone, items, subtotal, discount, total, paymentMethod, cashReceived, change);
+                return;
+            }
+
+            var overlay = document.getElementById('printingOverlay');
+            overlay.style.display = 'flex';
+
+            try {
+                var receiptData = buildReceipt(orderId, customerName, phone, items, subtotal, discount, total, paymentMethod, cashReceived, change);
+                await sendToPrinter(receiptData);
+                overlay.style.display = 'none';
+                showToast('Struk berhasil dicetak!', 'success');
+            } catch (err) {
+                overlay.style.display = 'none';
+                console.error('Print error:', err);
+                showToast('Gagal mencetak: ' + err.message + '. Menampilkan struk...', 'error');
+                showReceiptAlert(orderId, customerName, phone, items, subtotal, discount, total, paymentMethod, cashReceived, change);
+            }
+        }
+
+        function showReceiptAlert(orderId, customerName, phone, items, subtotal, discount, total, paymentMethod, cashReceived, change) {
+            var msg =
+                '=== STRUK LAUNDRYKU ===\n' +
+                'No. Pesanan : ' + orderId + '\n' +
+                'Pelanggan   : ' + customerName + '\n' +
+                'Telepon     : ' + (phone || '-') + '\n\n' +
+                '--- DETAIL ---\n';
+
+            var detail = '';
+            items.forEach(function(o) {
+                detail += o.service + ' (' + o.weight + 'kg) = Rp ' + o.subtotal.toLocaleString('id-ID') + '\n';
+            });
+
+            var fullMsg = msg + detail +
+                '\nSubtotal  : Rp ' + subtotal.toLocaleString('id-ID') +
+                '\nDiskon    : - Rp ' + discount.toLocaleString('id-ID') +
+                '\nTOTAL     : Rp ' + total.toLocaleString('id-ID') +
+                '\nPembayaran: ' + paymentMethod.toUpperCase() +
+                (paymentMethod === 'cash' ? '\nDiterima  : Rp ' + cashReceived.toLocaleString('id-ID') + '\nKembalian : Rp ' + change.toLocaleString('id-ID') : '') +
+                '\n\nTerima kasih!';
+
+            alert(fullMsg);
+        }
+
+        async function testPrint() {
+            if (!btDevice || !btDevice.gatt.connected) {
+                showToast('Printer tidak terhubung!', 'error');
+                return;
+            }
+
+            var overlay = document.getElementById('printingOverlay');
+            overlay.style.display = 'flex';
+
+            try {
+                var testReceipt =
+                    '\x1B\x61\x01' + // center
+                    '\x1B\x45\x01' + // bold on
+                    'TEST PRINT' + '\n' +
+                    '\x1B\x45\x00' + // bold off
+                    'LaundryKu POS' + '\n' +
+                    '================================\n' +
+                    '\x1B\x61\x00' + // left
+                    'Printer berhasil terhubung!' + '\n' +
+                    'Tanggal: ' + new Date().toLocaleDateString('id-ID') + '\n' +
+                    'Waktu  : ' + new Date().toLocaleTimeString('id-ID') + '\n' +
+                    '================================\n\n' +
+                    '\x1B\x61\x01' + // center
+                    'Semua siap digunakan :)' + '\n\n\n' +
+                    '\x1B\x64\x03' + // feed 3 lines
+                    '\x1D\x56\x00'; // full cut
+
+                var data = escposText(testReceipt);
+                await sendToPrinter(data);
+                overlay.style.display = 'none';
+                showToast('Test print berhasil!', 'success');
+            } catch (err) {
+                overlay.style.display = 'none';
+                showToast('Gagal test print: ' + err.message, 'error');
+            }
+        }
+
+        // ── Init ──
+        renderOrders();
+        initPrinterModal();
+
+        // Expose functions for onclick handlers
+        window.openPrinterModal = openPrinterModal;
+        window.scanAndConnectPrinter = scanAndConnectPrinter;
+        window.disconnectPrinter = disconnectPrinter;
+        window.testPrint = testPrint;
+    });
+    </script>
+</body>
+</html>
